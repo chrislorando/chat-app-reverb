@@ -8,7 +8,7 @@
     
         <div class="fixed top-0 right-4 left-1 bg-gray-800 p-2">
             <div class="flex items-center justify-between p-2 mb-2">
-                <a href="https://github.com/twinklescode" class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Twinkles Code</a>
+                <a href="https://github.com/chrislorando/chat-reverb-app" class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">{{ config('app.name', 'Laravel') }}</a>
 
                 <button id="userMenuButton" data-dropdown-toggle="userMenu" data-dropdown-placement="bottom-start" class="inline-flex  rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
                     <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
@@ -75,9 +75,9 @@
                         <div class="flex-shrink-0">
                             {{-- <img class="w-8 h-8 rounded-full" src="https://avatar.iran.liara.run/public/{{$row->id < 100 ? $row->id : 100 }}" alt="Neil image"> --}}
                             {{-- <img class="w-8 h-8 rounded-full" src="https://avatar.iran.liara.run/public/1" alt=" {{ $row->name }}"> --}}
-                            <div class="w-8 h-8 rounded-full {{ $row->avatar['color'] }}  flex items-center justify-center">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $row->avatar['color'] }}">
                                 <span class="text-xs font-medium text-white">
-                                    {{ $row->avatar['initials'] }}
+                                    {{ $row->avatar['initials'] }} 
                                 </span>
                             </div>
                         </div>
