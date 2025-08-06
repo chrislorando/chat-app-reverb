@@ -26,9 +26,10 @@ A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind C
 
 ### Prerequisites
 - PHP 8.2+
+- Laravel 11
 - Composer
 - Node.js 16+
-- Sqlite
+- SQLite
 
 ### Setup Steps
 
@@ -67,3 +68,6 @@ A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind C
    ```bash
    php artisan serve
    php artisan reverb:start
+
+## Demo Link
+   Will be coming soon
