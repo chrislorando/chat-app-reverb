@@ -134,8 +134,8 @@
                     @endif
 
                     @if ($photo || $document) 
-                    <div id="drawer-bottom-example" class="fixed bottom-0 left-0 right-0 z-40 w-full p-4 overflow-y-auto transition-transform bg-white dark:bg-gray-800 transform-none" tabindex="-1" aria-labelledby="drawer-bottom-label">
-                        <h5 id="drawer-bottom-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400"><svg class="w-4 h-4 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <div id="drawer-bottom-example" class="fixed md:top-14 md:h-modal bottom-0 left-0 md:left-96 right-0 z-50 p-4 overflow-y-auto transition-transform bg-white dark:bg-gray-900 transform-none" tabindex="-1" aria-labelledby="drawer-bottom-label">
+                        <h5 id="drawer-bottom-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400"><svg class="w-4 h-4 me-2.5" aria-modal="true" role="dialog" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
                     </svg>{{ $photo?->getClientOriginalName() ?? $document?->getClientOriginalName() }}</h5>
                         <button type="button" wire:click='closeModal' data-drawer-hide="drawer-bottom-example" aria-controls="drawer-bottom-example" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
@@ -146,10 +146,10 @@
                         </button>
                         
                         @if($photo)
-                            <div class="mb-4 aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex items-center justify-center">
-                                <img class="w-full h-full object-contain" 
+                            <div class="mb-2 p-4 h-full md:h-96 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex items-center justify-center">
+                                <img class="h-full min-w-min md:max-w-xs " 
                                     src="{{ $photo->temporaryUrl() }}"
-                                    alt="Preview gambar">
+                                    alt="Preview image">
                             </div>
                         @endif
 
@@ -192,14 +192,14 @@
                     <label for="send" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Send</label>
                     <div class="relative flex items-center gap-2">
 
-                        <button id="dropdownTopButton" data-dropdown-toggle="dropdownTop" data-dropdown-placement="top" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center" type="button">
+                        <button id="dropdownTopButton" data-dropdown-toggle="dropdownTop" data-dropdown-offset-distance="10" data-dropdown-offset-skidding="74" data-dropdown-placement="top" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center" type="button">
                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
                             </svg>
                         </button>
 
                         <!-- Dropdown menu -->
-                        <div id="dropdownTop" class="z-10 hidden bg-white rounded-lg shadow-sm w-48 dark:bg-gray-800">
+                        <div id="dropdownTop" class="z-50 hidden bg-white rounded-lg shadow-sm w-48 dark:bg-gray-800">
                             <ul class="py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton">
                                 <li>
                                     <label class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
