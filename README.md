@@ -21,6 +21,7 @@ A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind C
 - [Flowbite](https://flowbite.com/) — Tailwind UI components
 - [Laravel Reverb](https://laravel.com/docs/reverb) — Real-time WebSocket server
 - [SQLite](https://www.sqlite.org/) — Lightweight database for local development
+- [Nginx](https://nginx.org/) — HTTP web server
 
 ## Installation Guide
 
@@ -30,6 +31,7 @@ A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind C
 - Composer
 - Node.js 16+
 - SQLite
+- Nginx 
 
 ### Setup Steps
 
@@ -60,14 +62,22 @@ A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind C
    ```bash
    php artisan migrate
 
-6. **Build assets**
+6. **Reverb configuration**
+   ```bash
+   REVERB_APP_ID=chatapp
+   REVERB_APP_KEY=somekey
+   REVERB_APP_SECRET=somesecret
+   REVERB_HOST=127.0.0.1
+   REVERB_PORT=8080
+
+7. **Build assets**
    ```bash
    npm run dev
 
-7. **Start the application**
+8. **Start the application**
    ```bash
    php artisan serve
    php artisan reverb:start
 
 ## Demo Link
-   Will be coming soon
+   Coming soon
