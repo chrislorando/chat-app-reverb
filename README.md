@@ -1,5 +1,5 @@
 # Chat Reverb App
-![image](https://github.com/user-attachments/assets/a58cd344-1d09-4626-af6e-70884820c485)
+![image](https://github.com/user-attachments/assets/a837b236-d3a4-4e8c-a5e1-58d0bf83a213)
 ![image](https://github.com/user-attachments/assets/730b8f76-4f89-48e3-9cc6-fbf98d77e883)
 
 A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind CSS, and Reverb. This project serves both as a learning medium to deepen my understanding of modern web development technologies and as a showcase piece for my professional portfolio. The app demonstrates modern Laravel real-time capabilities with a minimal stack.
