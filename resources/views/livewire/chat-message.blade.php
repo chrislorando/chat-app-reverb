@@ -22,7 +22,13 @@
                         <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-4  {{ $row->sender_id==auth()->id() ? 'rounded-s-xl rounded-br-xl border-green-200 bg-green-100 dark:bg-green-700' : 'rounded-e-xl rounded-es-xl border-gray-200 bg-gray-100 dark:bg-gray-700' }}">
                             <div class="flex items-center space-x-2 rtl:space-x-reverse">
                                 <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ optional($row->sender)->name }}</span>
-                                <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{ date('d M Y H:i',strtotime($row->timestamp)) }}</span>
+                                <span class="text-sm font-normal text-gray-500 dark:text-gray-300">
+                                    @if (\Carbon\Carbon::parse($row->timestamp)->isToday())
+                                        {{ \Carbon\Carbon::parse($row->timestamp)->format('H:i') }}
+                                    @else
+                                        {{ \Carbon\Carbon::parse($row->timestamp)->format('d M Y H:i') }}
+                                    @endif
+                                </span>
                             </div>
                             @if($row->parent)
                                 <div class="flex justify-between bg-gray-50 dark:bg-gray-800">
@@ -53,29 +59,99 @@
                             @if($row->file_url)
                                 
                                 @if($row->message_type == 'Image')
-                                    <a href="{{ $row->fileUrl() }}" target="_blank" class="py-2">
+                                    {{-- <a href="{{ $row->fileUrl() }}" target="_blank" class="py-2">
                                         <img src="{{ $row->fileUrl() }}" class="h-auto rounded-lg" alt="{{ $row->file_name }}" />
-                                    </a>
+                                    </a> --}}
+                                    <div class="group relative my-2.5">
+                                        <div class="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
+                                            <a href="{{ $row->fileUrl() }}" download="{{ $row->file_name }}" data-tooltip-target="download-image" class="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50">
+                                                <svg class="w-5 h-5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
+                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3"/>
+                                                </svg>
+                                            </a>
+                                            <div id="download-image" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-700">
+                                                Download image
+                                                <div class="tooltip-arrow" data-popper-arrow></div>
+                                            </div>
+                                        </div>
+                                        <img src="{{ $row->fileUrl() }}" class="rounded-lg" />
+                                    </div>
                                 @elseif($row->message_type == 'Document')
-                                    <a href="{{ $row->fileUrl() }}" target="_blank" class="flex text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                                    {{-- <a href="{{ $row->fileUrl() }}" target="_blank" class="flex text-sm text-blue-600 dark:text-blue-400 hover:underline">
                                         <svg class="w-5 h-5 mr-1 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
                                         </svg>
                                         {{ $row->file_name }} ({{ $row->file_size }} kB)
-                                    </a>
+                                    </a> --}}
+                                    <div class="flex justify-between items-start my-2.5 bg-gray-50 {{ $row->sender_id==auth()->id() ? 'dark:bg-green-800' : 'dark:bg-gray-600' }} rounded-xl p-2 w-full">
+                                        <div class="me-2">
+                                            <span class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white pb-2">
+                                                <svg fill="none" aria-hidden="true" class="w-5 h-5 shrink-0" viewBox="0 0 20 21">
+                                                    <g clip-path="url(#clip0_3173_1381)">
+                                                        <path fill="#E2E5E7" d="M5.024.5c-.688 0-1.25.563-1.25 1.25v17.5c0 .688.562 1.25 1.25 1.25h12.5c.687 0 1.25-.563 1.25-1.25V5.5l-5-5h-8.75z"/>
+                                                        <path fill="#B0B7BD" d="M15.024 5.5h3.75l-5-5v3.75c0 .688.562 1.25 1.25 1.25z"/>
+                                                        <path fill="#CAD1D8" d="M18.774 9.25l-3.75-3.75h3.75v3.75z"/>
+                                                        <path fill="#F15642" d="M16.274 16.75a.627.627 0 01-.625.625H1.899a.627.627 0 01-.625-.625V10.5c0-.344.281-.625.625-.625h13.75c.344 0 .625.281.625.625v6.25z"/>
+                                                        <path fill="#fff" d="M3.998 12.342c0-.165.13-.345.34-.345h1.154c.65 0 1.235.435 1.235 1.269 0 .79-.585 1.23-1.235 1.23h-.834v.66c0 .22-.14.344-.32.344a.337.337 0 01-.34-.344v-2.814zm.66.284v1.245h.834c.335 0 .6-.295.6-.605 0-.35-.265-.64-.6-.64h-.834zM7.706 15.5c-.165 0-.345-.09-.345-.31v-2.838c0-.18.18-.31.345-.31H8.85c2.284 0 2.234 3.458.045 3.458h-1.19zm.315-2.848v2.239h.83c1.349 0 1.409-2.24 0-2.24h-.83zM11.894 13.486h1.274c.18 0 .36.18.36.355 0 .165-.18.3-.36.3h-1.274v1.049c0 .175-.124.31-.3.31-.22 0-.354-.135-.354-.31v-2.839c0-.18.135-.31.355-.31h1.754c.22 0 .35.13.35.31 0 .16-.13.34-.35.34h-1.455v.795z"/>
+                                                        <path fill="#CAD1D8" d="M15.649 17.375H3.774V18h11.875a.627.627 0 00.625-.625v-.625a.627.627 0 01-.625.625z"/>
+                                                    </g>
+                                                    <defs>
+                                                        <clipPath id="clip0_3173_1381">
+                                                            <path fill="#fff" d="M0 0h20v20H0z" transform="translate(0 .5)"/>
+                                                        </clipPath>
+                                                    </defs>
+                                                </svg>
+                                                {{ $row->file_name }}
+                                            </span>
+                                            <span class="flex text-xs font-normal text-gray-500 dark:text-gray-400 gap-2">
+                                                {{ $row->file_size }} kB 
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <a href="{{ $row->fileUrl() }}" download="{{ $row->file_name }}" class="inline-flex self-center items-center p-2 text-sm font-medium text-center text-gray-900 bg-gray-50 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-600 dark:hover:bg-gray-500 dark:focus:ring-gray-600" type="button">
+                                                <svg class="w-4 h-4 text-gray-900 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
+                                                    <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+
                                 @endif
                                 
                                    
                             @endif
-                            <p class="text-sm font-normal py-2 text-gray-900 dark:text-white">{{ $row->content }}</p>
-                            {{-- <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span> --}}
+                            <p class="text-sm font-normal py-2 text-gray-900 dark:text-white">
+                                {{-- {{ $row->content }} --}}
+                                {!! preg_replace_callback(
+                                    '/(https?:\/\/[^\s]+)/',
+                                    fn($match) => '<a href="' . e($match[0]) . '" target="_blank" class="text-blue-500 underline" target="_blank" rel="noopener noreferrer">' . e($match[0]) . '</a>',
+                                    nl2br(e($row->content))
+                                ) !!}
+                            </p>
+                            
+                            <div class="flex justify-end">
+                                <span class="text-sm font-normal text-gray-500 dark:text-gray-300">
+                                    @if($row->read_status == 'Unread')
+                                        <svg class="w-[20px] h-[20px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                        </svg>
+                                    @else
+                                        <svg class="w-[20px] h-[20px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                            <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z" clip-rule="evenodd"/>
+                                        </svg>
+
+                                    @endif
+                                </span>
+                            </div>
+                      
                         </div>
-                        <button title="Test" id="dropdownMenuIconButton{{ $row->id }}" data-dropdown-toggle="dropdownDots{{ $row->id }}" data-dropdown-placement="bottom-start" class="inline-flex p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800 dark:focus:ring-gray-600" type="button">
+                        <button title="Options" id="dropdownMenuIconButton{{ $row->id }}" data-dropdown-toggle="dropdownDots{{ $row->id }}" data-dropdown-placement="bottom-start" class="inline-flex self-start items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800 dark:focus:ring-gray-600" type="button">
                             <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
                                 <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
                             </svg>
                         </button>
-                        <div id="dropdownDots{{ $row->id }}" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-40 dark:bg-gray-600 dark:divide-gray-600">
+                        <div id="dropdownDots{{ $row->id }}" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-40 dark:bg-gray-800 dark:divide-gray-800">
                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton{{ $row->id }}">
                                 <li>
                                     <button type="button" wire:click='reply({{ $row->id }})' @click='document.getElementById("message").focus();' class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Reply</button>
@@ -246,14 +322,27 @@
                             </div>
                             <input wire:model='targetMessageId' type="hidden" class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="false" />
                         
-                            <input required 
+                            <textarea wire:ignore required 
+                                rows="1"
                                 key="{{ now()->timestamp }}"
                                 wire:model.defer='message' 
                                 wire:keydown="typing"
                                 wire:keyup.debounce.1500ms="notTyping"
                                 type="text" 
                                 id="message" 
-                                class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="off" />
+                                class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none overflow-hidden" 
+                                placeholder="Type a message" 
+                                autocomplete="off"
+                                rows="1"
+                                x-data="{ resize() { $el.style.height = 'auto'; $el.style.height = Math.min($el.scrollHeight, 120) + 'px'; } }"
+                                x-init="
+                                    resize(); 
+                                    $watch('$wire.message', () => resize())
+                                "
+                                x-on:input="resize()"
+                                style="min-height: 40px; max-height: 120px;"
+                                >
+                            </textarea>
                             <button type="submit" @disabled(empty($message)) class="text-white absolute end-2.5 bottom-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Send</button>
                         </div>
                     </div>
@@ -334,6 +423,7 @@
 
 @script
 <script>
+   
     $wire.on('loadMore', (event) => {
         console.log('LOADMORE');
         setTimeout(function() {
