@@ -323,16 +323,17 @@
                             <input wire:model='targetMessageId' type="hidden" class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="false" />
                         
                             <textarea wire:ignore required 
-                                rows="1"
+                                type="text" 
+                                id="message" 
                                 key="{{ now()->timestamp }}"
+                                class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none overflow-hidden" 
+                                style="min-height: 40px; max-height: 120px;"
+                                rows="1"
+                                placeholder="Type a message"
+                                autocomplete="off"
                                 wire:model.defer='message' 
                                 wire:keydown="typing"
                                 wire:keyup.debounce.1500ms="notTyping"
-                                type="text" 
-                                id="message" 
-                                class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none overflow-hidden" 
-                                placeholder="Type a message" 
-                                autocomplete="off"
                                 rows="1"
                                 x-data="{ resize() { $el.style.height = 'auto'; $el.style.height = Math.min($el.scrollHeight, 120) + 'px'; } }"
                                 x-init="
@@ -340,7 +341,7 @@
                                     $watch('$wire.message', () => resize())
                                 "
                                 x-on:input="resize()"
-                                style="min-height: 40px; max-height: 120px;"
+                                x-on:keydown.enter="if (!event.shiftKey) { event.preventDefault(); $wire.send(); }"
                                 >
                             </textarea>
                             <button type="submit" @disabled(empty($message)) class="text-white absolute end-2.5 bottom-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Send</button>
