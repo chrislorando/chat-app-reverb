@@ -58,8 +58,11 @@
                
                 @if ($isTyping)
                      <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                        {{-- {{ $userModel->email }} --}}
                         typing...
+                    </p>
+                @else
+                    <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                        {{ $userModel->email }}
                     </p>
                 @endif
             </div>

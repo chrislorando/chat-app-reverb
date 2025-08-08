@@ -85,8 +85,28 @@
                             <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
                                 {{ $row->name }} 
                             </p>
-                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                {{ $row->email }}
+                            <p class="text-sm text-gray-500 truncate dark:text-gray-400 flex">
+                                @if($row->latestMessage?->file_url)
+                                    @if($row->latestMessage?->message_type == 'Document')
+                                        <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M10 3v4a1 1 0 0 1-1 1H5m14-4v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7.914a1 1 0 0 1 .293-.707l3.914-3.914A1 1 0 0 1 9.914 3H18a1 1 0 0 1 1 1Z"/>
+                                        </svg>
+
+                                    @endif
+
+                                    @if($row->latestMessage?->message_type == 'Image')
+                                        <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path fill="currentColor" d="M16 18H8l2.5-6 2 4 1.5-2 2 4Zm-1-8.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 3v4a1 1 0 0 1-1 1H5m14-4v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7.914a1 1 0 0 1 .293-.707l3.914-3.914A1 1 0 0 1 9.914 3H18a1 1 0 0 1 1 1ZM8 18h8l-2-4-1.5 2-2-4L8 18Zm7-8.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
+                                        </svg>
+                                    @endif
+
+                                @endif
+                                
+                                {{ $row->latestMessage?->content 
+                                    ? \Illuminate\Support\Str::limit($row->latestMessage->content, 35) 
+                                    : $row->email }}
+                                 
                             </p>
                         </div>
                         {{-- <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white {{ $row->unread_messages_count <=0 ? 'hidden' : '' }}">

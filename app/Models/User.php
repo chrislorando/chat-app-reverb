@@ -96,4 +96,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Message::class, 'sender_id', 'id');
     }
+
+    public function latestMessage()
+    {
+        return $this->hasOne(Message::class, 'sender_id', 'id')->latestOfMany(); // atau ->ofMany('created_at', 'max') jika pakai Laravel < 8.42
+    }
 }

@@ -64,6 +64,7 @@ class ChatList extends Component
             $query->where('receiver_id', $authId)
                   ->where('read_status', 'Unread');
         }])
+         ->with(['latestMessage'])
         ->limit(10)
         ->paginate($this->perPage);  
 
