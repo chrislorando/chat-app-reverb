@@ -22,3 +22,17 @@
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
+.pattern-grid {
+    background-color: #111827; /* Tailwind bg-gray-900 */
+    background-image: 
+        linear-gradient(0deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.pattern-dots {
+    background-color: #111827;
+    background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 0);
+    background-size: 16px 16px;
+}

@@ -26,7 +26,7 @@ class ChatMessage extends Component
     public $uid;
     public $userId1;
     public $userId2;
-    public string $message;
+    public string $message = '';
     public $showChat = false;
     public $perPage = 10;
     public $key;
@@ -84,6 +84,11 @@ class ChatMessage extends Component
     {
         $this->showCamera = false;
         // $this->dispatchBrowserEvent('close-camera');
+    }
+
+    public function addEmoji($emoji): void
+    {
+        $this->message .= $emoji;
     }
 
     public function send()

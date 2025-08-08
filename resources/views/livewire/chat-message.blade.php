@@ -2,7 +2,7 @@
     @if($showChat)
         <livewire:chat-header :senderId="$userModel->id" :authId="auth()->id()" :wire:key="'chat-'.$userModel->id" />
 
-        <main class="md:ml-96 h-auto pt-12 bg-gray-900">
+        <main class="md:ml-96 min-h-screen pt-12 bg-gray-900 pattern-grid" x-data="{ showDeleteModal: false, confirmDeleteId: null }">
 
             <div class="grid grid-cols-1 sm:grid-cols-1 gap-4 mb-14 mt-8 p-5 pb-24">
                 <div id="old_last">&nbsp;</div>
@@ -154,10 +154,16 @@
                         <div id="dropdownDots{{ $row->id }}" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-40 dark:bg-gray-800 dark:divide-gray-800">
                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton{{ $row->id }}">
                                 <li>
-                                    <button type="button" wire:click='reply({{ $row->id }})' @click='document.getElementById("message").focus();' class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Reply</button>
+                                    <button type="button" wire:click='reply({{ $row->id }})' @click='document.getElementById("message").focus();' class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Reply</button>
                                 </li>
                                 <li>
-                                    <button type="button" wire:click='remove({{ $row->id }})' class="{{ $row->sender_id==auth()->id() ? 'block' : 'hidden' }} px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Delete</button>
+                                    <button 
+                                    type="button" 
+                                    data-modal-target="popup-modal" 
+                                    data-modal-toggle="popup-modal"
+                                    {{-- wire:click='remove({{ $row->id }})'  --}}
+                                    @click="confirmDeleteId = {{ $row->id }}; showDeleteModal = true"
+                                    class="{{ $row->sender_id==auth()->id() ? 'block' : 'hidden' }} block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Delete</button>
                                 </li>
                             </ul>
                         </div>
@@ -266,7 +272,19 @@
 
 
                     <label for="send" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Send</label>
-                    <div class="relative flex items-center gap-2">
+                    
+                    
+                    <div class="relative flex items-center gap-2"
+                        x-data="{
+                            showPicker: false,
+                            insertEmoji(e) {
+                                $wire.addEmoji(e.detail.unicode);
+                                this.showPicker = false;
+                            }
+                        }"
+                        @emoji-click="insertEmoji"
+                        @click.outside="showPicker = false"
+                        @keydown.escape.window="showPicker = false">
 
                         <button id="dropdownTopButton" data-dropdown-toggle="dropdownTop" data-dropdown-offset-distance="10" data-dropdown-offset-skidding="74" data-dropdown-placement="top" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center" type="button">
                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -306,13 +324,18 @@
                             </ul>
                         </div>
 
-                        <button class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center">
+                        <button type="button" @click="showPicker = !showPicker" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center">
                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9h.01M8.99 9H9m12 3a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM6.6 13a5.5 5.5 0 0 0 10.81 0H6.6Z"/>
                             </svg>
                         </button>
                         
-                       
+                        <emoji-picker 
+                            x-show="showPicker" 
+                            x-transition 
+                            class="absolute w-full bottom-16 z-50 mt-2 shadow-lg bg-white dark:bg-gray-800 border rounded-lg"
+                        ></emoji-picker>
+
                         <div class="flex-1 relative">
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                 <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-text" viewBox="0 0 16 16">
@@ -350,6 +373,31 @@
                 </form>
               
             </footer>
+
+            <div x-show="showDeleteModal"
+                @keydown.escape.window="showDeleteModal = false"
+                id="popup-modal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                <div class="relative p-4 w-full max-w-md max-h-full">
+                    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+                        <button type="button" class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="popup-modal">
+                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                            </svg>
+                            <span class="sr-only">Close modal</span>
+                        </button>
+                        <div class="p-4 md:p-5 text-center">
+                            <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                            </svg>
+                            <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are you sure you want to delete this message?</h3>
+                            <button @click="$wire.remove(confirmDeleteId); showModal = false" data-modal-hide="popup-modal" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
+                                Yes, I'm sure
+                            </button>
+                            <button @click="showModal = false" data-modal-hide="popup-modal" type="button" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">No, cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     
     @else
