@@ -93,11 +93,19 @@ class ChatMessage extends Component
 
     public function send()
     {
-        if (trim($this->message) === '') {
+        $this->validate([
+            'message' => 'nullable|string',
+            'photo' => 'nullable|image|max:10240', // 10MB max
+            'document' => 'nullable|file|max:10240|mimes:pdf,doc,docx,txt', // 10MB max
+        ], [
+            'message.required_without_all' => 'Either a message or a file is required',
+        ]);
+        
+        if (trim($this->message) === '' && !$this->photo && !$this->document) {
             return;
         }
-        
-        $this->dispatch('$refresh');
+
+        // $this->dispatch('$refresh');
 
         $data = [
             'sender_id'=> auth()->id(),
@@ -107,8 +115,8 @@ class ChatMessage extends Component
             'timestamp' => now()
         ];
 
-         if ($this->document) {
-            $path = $this->document->store('public/documents');
+        if ($this->document) {
+            $path = $this->document->storePublicly('documents');
             $data = array_merge($data, [
                 'message_type' => 'Document',
                 'file_name' => $this->document->getClientOriginalName(),
@@ -119,7 +127,7 @@ class ChatMessage extends Component
         }
 
         if (!empty($this->photo)) {
-            $path = $this->photo->store('public/photos');
+            $path = $this->photo->storePublicly('images');
             $data = array_merge($data, [
                 'message_type' => 'Image',
                 'file_name' => $this->photo->getClientOriginalName(),
@@ -131,7 +139,7 @@ class ChatMessage extends Component
 
         if ($this->cameraImage) {
             $filename = 'camera_' . time() . '.jpg';
-            $path = $this->cameraImage->storeAs('public/photos', $filename);
+            $path = $this->cameraImage->storeAs('photos', $filename);
             $data = array_merge($data, [
                 'message_type' => 'Image',
                 'file_name' => $filename,
@@ -150,7 +158,22 @@ class ChatMessage extends Component
         event(new PushMessage($this->userId1, $this->userId2, $this->message));
         event(new MessageSent($this->uid, auth()->id()));
 
-        $this->reset(['message','targetMessageId','targetMessageText','targetMessageType','targetMessageFileUrl','targetMessageFileSize','targetMessageFileName','targetSender','isTyping','photo', 'document', 'cameraImage']);
+        // $this->closeUploadDrawer();
+        $this->reset([
+            'message',
+            'targetMessageId',
+            'targetMessageText',
+            'targetMessageType',
+            'targetMessageFileUrl',
+            'targetMessageFileSize',
+            'targetMessageFileName',
+            'targetSender',
+            'isTyping',
+            'photo', 
+            'document', 
+            'cameraImage'
+        ]);
+
         // $this->dispatch('$refresh');
     }
 
@@ -216,6 +239,7 @@ class ChatMessage extends Component
         ]);
 
         event(new MessageSent(auth()->id(), $this->uid, true));
+        $this->closeUploadDrawer();
         // event(new UserOnline(auth()->id(),  true));
 
         // $this->dispatch('read-chat')->to(ChatList::class);
@@ -240,6 +264,7 @@ class ChatMessage extends Component
         // $this->dispatch('open-chat', uid:$this->uid)->to(ChatMessage::class);
 
         $this->dispatch('$refresh');
+        event(new MessageSent(auth()->id(), $this->uid, true));
     }
 
     public function reply(Message $model)
@@ -265,8 +290,9 @@ class ChatMessage extends Component
         $this->targetMessageFileUrl = null;
     }
 
-    public function closeModal()
+    public function closeUploadDrawer()
     {
+        $this->message = '';
         $this->photo = null;
         $this->document = null;
         $this->cameraImage = null;
@@ -275,6 +301,23 @@ class ChatMessage extends Component
 
     public function remove(Message $model)
     {
+        // Hapus file jika ada file_url
+        if ($model->file_url) {
+            // Ambil path relatif dari file_url
+            $parsedUrl = parse_url($model->file_url, PHP_URL_PATH);
+            // Misal: /chat-reverb/images/krgffGRjmyiCDWmvj7USjC76lsL9DFcN8iSs2vzR.png
+            // Hilangkan leading slash dan nama bucket
+            $path = ltrim($parsedUrl, '/');
+            $bucket = config('filesystems.disks.minio.bucket', 'chat-reverb');
+            if (str_starts_with($path, $bucket . '/')) {
+                $path = substr($path, strlen($bucket) + 1);
+            }
+            // Hapus file dari storage
+            // Determine the correct disk, defaulting to 's3' if not set
+            $disk = config('filesystems.default', 's3');
+            Storage::disk($disk)->delete($path);
+        }
+
         $model->delete();
       
         $this->userId1 = min(auth()->id(), $this->uid);

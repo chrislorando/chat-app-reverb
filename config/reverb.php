@@ -33,7 +33,11 @@ return [
             'port' => env('REVERB_SERVER_PORT', 8080),
             'hostname' => env('REVERB_HOST'),
             'options' => [
-                'tls' => [],
+                'tls' => [
+                    // 'local_cert' => 'C:\Users\Chris\.config\herd\config\valet\Certificates\chat-app-reverb.test.crt'
+                    // 'local_cert' => 'C:/Users/Chris/.config/herd/config/valet/Certificates/chat-app-reverb.test.crt',
+                    // 'local_pk' => 'C:/Users/Chris/.config/herd/config/valet/Certificates/chat-app-reverb.test.key',
+                ],
             ],
             'max_request_size' => env('REVERB_MAX_REQUEST_SIZE', 10_000),
             'scaling' => [

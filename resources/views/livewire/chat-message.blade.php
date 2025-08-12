@@ -32,7 +32,7 @@
                             </div>
                             @if($row->parent)
                                 <div class="flex justify-between bg-gray-50 dark:bg-gray-800">
-                                    <blockquote class="p-2  border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+                                    <blockquote class="break-all p-2 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
                                         <span class="text-xs text-gray-900 dark:text-green-400">{{ $row->parent->sender->name==auth()->user()->name ? "You" : $row->parent->sender->name }}</span>
                                         
                                         @if($row->parent->message_type == 'Document')
@@ -121,7 +121,7 @@
                                 
                                    
                             @endif
-                            <p class="text-sm font-normal py-2 text-gray-900 dark:text-white">
+                            <p class="break-all text-sm font-normal py-2 text-gray-900 dark:text-white">
                                 {{-- {{ $row->content }} --}}
                                 {!! preg_replace_callback(
                                     '/(https?:\/\/[^\s]+)/',
@@ -216,11 +216,14 @@
                     @endif
 
                     @if ($photo || $document) 
-                    <div id="drawer-bottom-example" class="fixed md:top-14 md:h-modal bottom-0 left-0 md:left-96 right-0 z-50 p-4 overflow-y-auto transition-transform bg-white dark:bg-gray-900 transform-none" tabindex="-1" aria-labelledby="drawer-bottom-label">
-                        <h5 id="drawer-bottom-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400"><svg class="w-4 h-4 me-2.5" aria-modal="true" role="dialog" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-                    </svg>{{ $photo?->getClientOriginalName() ?? $document?->getClientOriginalName() }}</h5>
-                        <button type="button" wire:click='closeModal' data-drawer-hide="drawer-bottom-example" aria-controls="drawer-bottom-example" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
+                    <div id="drawer-upload" class="fixed md:top-14 md:h-modal bottom-0 left-0 md:left-96 right-0 z-50 p-4 overflow-y-auto transition-transform bg-white dark:bg-gray-900 transform-none" tabindex="-1" aria-labelledby="drawer-bottom-label">
+                        <h5 id="drawer-bottom-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+                            <svg class="w-4 h-4 me-2.5" aria-modal="true" role="dialog" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                            </svg>
+                            {{ $photo?->getClientOriginalName() ?? $document?->getClientOriginalName() }}
+                        </h5>
+                        <button type="button" wire:click='closeUploadDrawer' data-drawer-hide="drawer-upload" aria-controls="drawer-upload" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
                             <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                             </svg>
@@ -256,18 +259,20 @@
                             </div>
                             <input wire:model='targetMessageId' type="hidden" class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="false" />
                         
-                            <input required 
-                                key="{{ now()->timestamp }}"
-                                wire:model.defer='message' 
-                                wire:keydown="typing"
-                                wire:keyup.debounce.1500ms="notTyping"
+                            <input 
+                                key="upload-{{ now()->timestamp }}"
+                                wire:model='message' 
+                                {{-- wire:keydown="typing"
+                                wire:keydown.debounce.1500ms="notTyping" --}}
                                 type="text" 
-                                id="message" 
+                                id="message-upload" 
                                 class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="off" />
-                            <button type="submit" @disabled(empty($message)) class="text-white absolute end-2.5 bottom-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Send</button>
+                            <button type="submit" class="text-white absolute end-2.5 bottom-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Send</button>
                         </div>
                     </div>
-                      
+
+                    @else
+                        <div id="drawer-upload"></div>
                     @endif
 
 
@@ -286,16 +291,16 @@
                         @click.outside="showPicker = false"
                         @keydown.escape.window="showPicker = false">
 
-                        <button id="dropdownTopButton" data-dropdown-toggle="dropdownTop" data-dropdown-offset-distance="10" data-dropdown-offset-skidding="74" data-dropdown-placement="top" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center" type="button">
+                        <button wire:loading.attr="disabled" id="dropdownTopButton" data-dropdown-toggle="dropdownTop" data-dropdown-offset-distance="10" data-dropdown-offset-skidding="74" data-dropdown-placement="top" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center" type="button">
                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
                             </svg>
                         </button>
 
                         <!-- Dropdown menu -->
-                        <div id="dropdownTop" class="z-50 hidden bg-white rounded-lg shadow-sm w-48 dark:bg-gray-800">
+                        <div wire:loading.attr="disabled" id="dropdownTop" class="z-50 hidden bg-white rounded-lg shadow-sm w-48 dark:bg-gray-800">
                             <ul class="py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton">
-                                <li>
+                                <li data-drawer-target="drawer-upload">
                                     <label class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
                                         <svg class="w-5 h-5 mr-2 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
@@ -304,7 +309,7 @@
                                         <input type="file" wire:model="document" class="hidden" accept=".pdf,.doc,.docx,.txt">
                                     </label>
                                 </li>
-                                <li>
+                                <li data-drawer-target="drawer-upload">
                                     <label class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
                                         <svg class="w-5 h-5 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
@@ -324,7 +329,7 @@
                             </ul>
                         </div>
 
-                        <button type="button" @click="showPicker = !showPicker" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center">
+                        <button wire:loading.attr="disabled" type="button" @click="showPicker = !showPicker" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center">
                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9h.01M8.99 9H9m12 3a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM6.6 13a5.5 5.5 0 0 0 10.81 0H6.6Z"/>
                             </svg>
@@ -345,29 +350,31 @@
                             </div>
                             <input wire:model='targetMessageId' type="hidden" class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="false" />
                         
-                            <textarea wire:ignore required 
-                                type="text" 
-                                id="message" 
-                                key="{{ now()->timestamp }}"
-                                class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none overflow-hidden" 
-                                style="min-height: 40px; max-height: 120px;"
-                                rows="1"
-                                placeholder="Type a message"
-                                autocomplete="off"
-                                wire:model.defer='message' 
-                                wire:keydown="typing"
-                                wire:keyup.debounce.1500ms="notTyping"
-                                rows="1"
-                                x-data="{ resize() { $el.style.height = 'auto'; $el.style.height = Math.min($el.scrollHeight, 120) + 'px'; } }"
-                                x-init="
-                                    resize(); 
-                                    $watch('$wire.message', () => resize())
-                                "
-                                x-on:input="resize()"
-                                x-on:keydown.enter="if (!event.shiftKey) { event.preventDefault(); $wire.send(); }"
-                                >
-                            </textarea>
-                            <button type="submit" @disabled(empty($message)) class="text-white absolute end-2.5 bottom-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Send</button>
+                            @if (!$photo || !$document) 
+                                <textarea wire:ignore required
+                                    type="text" 
+                                    id="message" 
+                                    key="{{ now()->timestamp }}"
+                                    class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none overflow-hidden" 
+                                    style="min-height: 40px; max-height: 120px;"
+                                    rows="1"
+                                    placeholder="Type a message"
+                                    autocomplete="off"
+                                    wire:model.defer='message' 
+                                    wire:keydown="typing"
+                                    wire:keyup.debounce.1500ms="notTyping"
+                                    rows="1"
+                                    x-data="{ resize() { $el.style.height = 'auto'; $el.style.height = Math.min($el.scrollHeight, 120) + 'px'; } }"
+                                    x-init="
+                                        resize(); 
+                                        $watch('$wire.message', () => resize())
+                                    "
+                                    x-on:input="resize()"
+                                    x-on:keydown.enter="if (!event.shiftKey) { event.preventDefault(); $wire.send(); }"
+                                    >
+                                </textarea>
+                                <button type="submit" @disabled(empty($message)) class="text-white absolute end-2.5 bottom-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Send</button>
+                            @endif
                         </div>
                     </div>
                 </form>
@@ -575,12 +582,12 @@
             console.log('ROOM', `room.${event.userId1}.${event.userId2}`);
             console.log("EVENT", event);
             console.log("BROADCAST", e);
-            Livewire.dispatch('$refresh');
-            $wire.dispatch('$refresh');
+            // Livewire.dispatch('$refresh');
+            // $wire.dispatch('$refresh');
             $wire.dispatch('triggerMessage', e);
 
-            $dispatch('presence-online', { userId: event.userId1, isOnline: true });
-            $dispatch('presence-online', { userId: event.userId2, isOnline: true });
+            // $dispatch('presence-online', { userId: event.userId1, isOnline: true });
+            // $dispatch('presence-online', { userId: event.userId2, isOnline: true });
 
             setTimeout(function() {
                 document.getElementById("message_last").scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });          

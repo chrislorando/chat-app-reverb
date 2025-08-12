@@ -1,12 +1,12 @@
 <aside
     class="fixed top-0 left-0 z-40 w-screen md:w-96 h-screen transition-transform -translate-x-full bg-white border-r border-gray-200 md:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
     tabindex="-1" 
-    aria-label="Sidenav"
+    aria-labelledby="Sidenav"
     id="drawer-navigation"
 >
     <div class="overflow-y-auto py-2  h-full bg-white dark:bg-gray-800">
     
-        <div class="fixed top-0 right-4 left-1 bg-gray-800 p-2">
+        <div class="fixed top-0 bg-gray-800 p-2 w-full">
             <div class="flex items-center justify-between p-2 mb-2">
                 <a href="https://github.com/chrislorando/chat-reverb-app" class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">{{ config('app.name', 'Laravel') }}</a>
 
