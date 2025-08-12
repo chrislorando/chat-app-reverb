@@ -31,8 +31,8 @@
                                 </span>
                             </div>
                             @if($row->parent)
-                                <div class="flex justify-between bg-gray-50 dark:bg-gray-800">
-                                    <blockquote class="break-all p-2 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+                                <div class="mt-1 flex justify-between bg-gray-50 dark:bg-gray-800">
+                                    <blockquote class="break-all p-2 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 {{ $row->sender_id==auth()->id() ? 'dark:bg-gray-700' : 'dark:bg-gray-800' }}">
                                         <span class="text-xs text-gray-900 dark:text-green-400">{{ $row->parent->sender->name==auth()->user()->name ? "You" : $row->parent->sender->name }}</span>
                                         
                                         @if($row->parent->message_type == 'Document')
@@ -151,7 +151,7 @@
                                 <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
                             </svg>
                         </button>
-                        <div id="dropdownDots{{ $row->id }}" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-40 dark:bg-gray-800 dark:divide-gray-800">
+                        <div id="dropdownDots{{ $row->id }}" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-40 dark:bg-gray-800 dark:divide-gray-800">
                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton{{ $row->id }}">
                                 <li>
                                     <button type="button" wire:click='reply({{ $row->id }})' @click='document.getElementById("message").focus();' class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Reply</button>
