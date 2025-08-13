@@ -64,10 +64,26 @@ class ChatList extends Component
             $query->where('receiver_id', $authId)
                   ->where('read_status', 'Unread');
         }])
-         ->with(['latestMessage'])
+        // ->with(['latestMessage'])
         ->limit(10)
         ->paginate($this->perPage);  
 
+
+        $this->models->setCollection(
+            $this->models->getCollection()->map(function ($user) use ($authId) {
+                $user->latest_message = Message::where(function ($q) use ($authId, $user) {
+                        $q->where('sender_id', $authId)
+                        ->where('receiver_id', $user->id);
+                    })
+                    ->orWhere(function ($q) use ($authId, $user) {
+                        $q->where('receiver_id', $authId)
+                        ->where('sender_id', $user->id);
+                    })
+                    ->latest()
+                    ->first();
+                return $user;
+            })
+        );
         return view('livewire.chat-list', [
             'models' => $this->models
         ]);

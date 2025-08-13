@@ -103,9 +103,9 @@
 
                                 @endif
                                 
-                                {{ $row->latestMessage?->content 
-                                    ? \Illuminate\Support\Str::limit($row->latestMessage->content, 35) 
-                                    : $row->email }}
+                                {{ $row->latest_message?->content 
+                                    ? \Illuminate\Support\Str::limit($row->latest_message->content, 35) 
+                                    : $row->latest_message->file_name ?? $row->email }}
                                  
                             </p>
                         </div>

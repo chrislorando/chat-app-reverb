@@ -96,7 +96,7 @@ class ChatMessage extends Component
         $this->validate([
             'message' => 'nullable|string',
             'photo' => 'nullable|image|max:10240', // 10MB max
-            'document' => 'nullable|file|max:10240|mimes:pdf,doc,docx,txt', // 10MB max
+            'document' => 'nullable|file|max:10240|mimes:pdf,doc,docx,txt,xls,xlsx,ppt', // 10MB max
         ], [
             'message.required_without_all' => 'Either a message or a file is required',
         ]);
