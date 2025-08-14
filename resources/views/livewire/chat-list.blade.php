@@ -27,7 +27,7 @@
                     </ul>
                 </div>
             </div>
-            <form action="#" method="GET" class="mb-2">
+            <form action="#" method="GET" class="mb-4">
                 <label for="sidebar-search" class="sr-only">Search</label>
                 <div class="relative">
                     <div
@@ -56,9 +56,16 @@
                     />
                 </div>
             </form>
+
+         
+            <a href="$" class=" text-green-800 text-sm font-medium me-2 px-3 py-1 rounded-full dark:text-green-300 border border-green-400">All</a>
+
+            <a href="$" class=" text-green-800 text-sm font-medium me-2 px-3 py-1 rounded-full dark:text-green-300 border border-green-400">Unread</a>
+
+
         </div>
 
-        <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700 space-y-0 mt-28">
+        <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700 space-y-0 mt-36">
             @php($i=0)
             @foreach($models as $row)
             @php($i++)
@@ -86,15 +93,15 @@
                                 {{ $row->name }} 
                             </p>
                             <p class="text-sm text-gray-500 truncate dark:text-gray-400 flex">
-                                @if($row->latestMessage?->file_url)
-                                    @if($row->latestMessage?->message_type == 'Document')
+                                @if($row->latest_message?->file_url)
+                                    @if($row->latest_message?->message_type == 'Document')
                                         <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                             <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M10 3v4a1 1 0 0 1-1 1H5m14-4v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7.914a1 1 0 0 1 .293-.707l3.914-3.914A1 1 0 0 1 9.914 3H18a1 1 0 0 1 1 1Z"/>
                                         </svg>
 
                                     @endif
 
-                                    @if($row->latestMessage?->message_type == 'Image')
+                                    @if($row->latest_message?->message_type == 'Image')
                                         <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                             <path fill="currentColor" d="M16 18H8l2.5-6 2 4 1.5-2 2 4Zm-1-8.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
                                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 3v4a1 1 0 0 1-1 1H5m14-4v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7.914a1 1 0 0 1 .293-.707l3.914-3.914A1 1 0 0 1 9.914 3H18a1 1 0 0 1 1 1ZM8 18h8l-2-4-1.5 2-2-4L8 18Zm7-8.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
@@ -102,6 +109,12 @@
                                     @endif
 
                                 @endif
+
+                                {!! preg_replace_callback(
+                                    '/(https?:\/\/[^\s]+)/',
+                                    fn($match) => '<svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.213 9.787a3.391 3.391 0 0 0-4.795 0l-3.425 3.426a3.39 3.39 0 0 0 4.795 4.794l.321-.304m-.321-4.49a3.39 3.39 0 0 0 4.795 0l3.424-3.426a3.39 3.39 0 0 0-4.794-4.795l-1.028.961"/></svg>',
+                                    nl2br(e($row->latest_message?->content))
+                                ) !!}
                                 
                                 {{ $row->latest_message?->content 
                                     ? \Illuminate\Support\Str::limit($row->latest_message->content, 35) 

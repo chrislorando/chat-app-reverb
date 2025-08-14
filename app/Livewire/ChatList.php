@@ -37,6 +37,8 @@ class ChatList extends Component
 
 
         $this->dispatch('open-chat', uid:$uid, userId1:$userId1, userId2:$userId2, action:'init')->to(ChatMessage::class);
+        $this->dispatch('toggle-profile')->to(ChatHeader::class);
+        $this->dispatch('toggle-media')->to(ChatHeader::class);
         $this->isActiveChat = $uid;
     }
 

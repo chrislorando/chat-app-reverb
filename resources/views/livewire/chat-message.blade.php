@@ -1,8 +1,8 @@
-<div>
+<div x-data="{ showDeleteModal: false, confirmDeleteId: null }">
     @if($showChat)
         <livewire:chat-header :senderId="$userModel->id" :authId="auth()->id()" :wire:key="'chat-'.$userModel->id" />
 
-        <main class="md:ml-96 min-h-screen pt-12 bg-gray-900 pattern-grid" x-data="{ showDeleteModal: false, confirmDeleteId: null }">
+        <main class="md:ml-96 min-h-screen pt-12 bg-gray-900 pattern-grid">
 
             <div class="grid grid-cols-1 sm:grid-cols-1 gap-4 mb-14 mt-8 p-5 pb-24">
                 <div id="old_last">&nbsp;</div>
@@ -198,9 +198,9 @@
             </div>
 
             <div id="message_last">&nbsp;</div>
+        </main>
 
-
-            <footer class="bg-white dark:bg-gray-800 shadow fixed bottom-0 md:left-96 left-0 right-0 z-0 p-2">
+        <footer class="bg-gray-800 shadow fixed bottom-0 md:left-96 left-0 right-0 md:z-20 z-10 p-2" style=" transform: none !important;">
                 <form wire:submit.prevent='send'>  
 
                     @if($targetMessageId)
@@ -432,7 +432,6 @@
                     </div>
                 </div>
             </div>
-        </main>
     
     @else
 
