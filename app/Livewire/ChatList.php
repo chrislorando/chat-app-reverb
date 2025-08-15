@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Livewire\Actions\Logout;
+use App\Models\Contact;
 use App\Models\Message;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
@@ -20,6 +21,8 @@ class ChatList extends Component
     public $perPage = 10;
 
     public $uid;
+    public $isAddContactOpen = false;
+    
 
     public function loadMore()
     {
@@ -49,12 +52,42 @@ class ChatList extends Component
         $this->redirect('/', navigate: true);
     }
 
+    #[On('toggle-contact')]
+    public function toggleContact()
+    {
+        $this->isAddContactOpen = !$this->isAddContactOpen;
+    }
+
+    #[On('refresh-list')]
+    public function refreshList()
+    {
+        $this->dispatch('$refresh');
+    }
+
     // #[On('read-chat')] 
     public function render()
     {
         $authId = auth()->id();
 
-        $this->models = User::when($this->search != '', function ($query) {
+        $contacts = Contact::where('user_id', $authId)->pluck('acquaintance_id');
+        $existChatUser = Message::where(function ($q) use ($authId) {
+                $q->where('sender_id', $authId)
+                ->orWhere('receiver_id', $authId);
+            })
+            ->get()
+            ->flatMap(function ($message) use ($authId) {
+                return [
+                    $message->sender_id == $authId ? $message->receiver_id : $message->sender_id
+                ];
+            })
+            ->unique()
+            ->values();
+
+
+        $mergedContact = $contacts->merge($existChatUser)->unique()->values();
+
+        $this->models = User::whereIn('id', $mergedContact)
+        ->when($this->search != '', function ($query) {
             $query->where(function ($q) {
                 $q->where('name', 'like', '%' . $this->search . '%')
                   ->orWhere('username', 'like', '%' . $this->search . '%')

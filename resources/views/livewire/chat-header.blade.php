@@ -54,17 +54,17 @@
                 </div>
                 <div class="flex-1 min-w-0 ms-4">
                     <button type="button" @click="$dispatch('toggle-profile')" data-drawer-target="drawer-profile" data-drawer-show="drawer-profile" data-drawer-placement="right" data-drawer-backdrop="false" data-drawer-body-scrolling="true" aria-controls="drawer-profile" class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                        {{ $userModel->name }} 
+                        {{ $userModel->alias_name ?? $userModel->email }} 
                     </button>
                 
                     @if ($isTyping)
                         <p class="text-sm text-gray-500 truncate dark:text-gray-400">
                             typing...
                         </p>
-                    @else
+                    {{-- @else
                         <p class="text-sm text-gray-500 truncate dark:text-gray-400">
                             {{ $userModel->email }}
-                        </p>
+                        </p> --}}
                     @endif
                 </div>
             </div>
@@ -72,12 +72,12 @@
     </header>
 
     <div id="drawer-profile" class="fixed top-0 right-0 z-50 w-screen md:w-96 h-screen p-4 overflow-y-auto transition-transform translate-x-full bg-white dark:bg-gray-800 border-s border-slate-600 {{ $isProfileOpen ? 'transform-none' : '' }}" tabindex="-1" aria-labelledby="drawer-profile-label">
-        <h5 id="drawer-profile-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
-            <svg class="w-4 h-4 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+        <button type="button" @click="$dispatch('toggle-contact-header', [{{ $userModel->id }}])" id="drawer-profile-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+            <svg class="w-6 h-6 me-2.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.779 17.779 4.36 19.918 6.5 13.5m4.279 4.279 8.364-8.643a3.027 3.027 0 0 0-2.14-5.165 3.03 3.03 0 0 0-2.14.886L6.5 13.5m4.279 4.279L6.499 13.5m2.14 2.14 6.213-6.504M12.75 7.04 17 11.28"/>
             </svg>
             Contact info
-        </h5>
+        </button>
         <button type="button" @click="$dispatch('toggle-profile')" data-drawer-hide="drawer-profile" aria-controls="drawer-profile" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
             <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
@@ -91,7 +91,7 @@
                     {{ $userModel->avatar['initials'] }}
                 </span>
             </div>
-            <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">{{ $userModel->name }}</h5>
+            <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">{{ $userModel->alias_name ?? $userModel->name }} </h5>
             <span class="text-sm text-gray-500 dark:text-gray-400">{{ $userModel->email }}</span>
         </div>
 
@@ -312,10 +312,25 @@
                     @endforeach
                 @endif
             </div>
-          
         </div>
+    </div>
 
+    <div id="drawer-contact" class="fixed top-0 right-0 z-50 w-screen md:w-96 h-screen p-4 overflow-y-auto transition-transform translate-x-full bg-white dark:bg-gray-800 border-s border-slate-600 {{ $isAddContactHeaderOpen ? 'transform-none' : '' }}" tabindex="-1" aria-labelledby="drawer-contact-label">
+        <h5 id="drawer-contact-label" class="inline-flex items-center mb-6 text-base font-semibold text-gray-500 uppercase dark:text-gray-400">
+            <svg class="w-6 h-6 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+            </svg>
+            Edit contact
+        </h5>
 
+        <button type="button" @click="$dispatch('toggle-contact-header', null)" data-drawer-hide="drawer-contact" aria-controls="drawer-contact" class="mb-2 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
+            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+            </svg>
+            <span class="sr-only">Close menu</span>
+        </button>
+
+        <livewire:chat-contact-form :key="'chat-contact-form-2'" :isNewRecord="false" />
 
     </div>
 </div>

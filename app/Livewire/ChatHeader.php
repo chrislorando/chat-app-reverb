@@ -23,6 +23,7 @@ class ChatHeader extends Component
     public $isTabMediaOpen = false;
     public $isTabDocsOpen = false;
     public $isTabLinksOpen = false;
+    public $isAddContactHeaderOpen = false;
 
     public function mount($senderId, $authId)
     {
@@ -121,6 +122,16 @@ class ChatHeader extends Component
         $this->isTabMediaOpen = false;
         $this->isTabDocsOpen = false;
         $this->isTabLinksOpen = false;
+    }
+
+    #[On('toggle-contact-header')]
+    public function toggleContactHeader($user = null)
+    {
+        $this->isAddContactHeaderOpen = !$this->isAddContactHeaderOpen;
+        if($user){
+            $this->dispatch('set-contact-user', user:$user);
+        }
+        
     }
 
     #[On('show-media')]

@@ -248,6 +248,13 @@ class ChatMessage extends Component
 
     }
 
+    #[On('open-home')] 
+    public function openHome()
+    {
+        $this->showChat = false;
+        $this->dispatch('$refresh');
+    }
+
     #[On('echo:room,PushMessage')] 
     public function testAllChannel($data)
     {

@@ -37,6 +37,7 @@ class User extends Authenticatable
         'initials',
         'avatar_color',
         'avatar',
+        'alias_name'
     ];
 
     /**
@@ -52,9 +53,14 @@ class User extends Authenticatable
         ];
     }
 
+    public function getAliasNameAttribute()
+    {
+        return $this->contact?->alias_name;
+    }
+
     public function getInitialsAttribute(): string
     {
-        $names = explode(' ', $this->name);
+        $names = explode(' ', $this->alias_name ?? $this->name);
         $initials = '';
         
         foreach ($names as $name) {
@@ -100,6 +106,11 @@ class User extends Authenticatable
 
     public function latestMessage()
     {
-        return $this->hasOne(Message::class, 'sender_id', 'id')->latestOfMany(); // atau ->ofMany('created_at', 'max') jika pakai Laravel < 8.42
+        return $this->hasOne(Message::class, 'sender_id', 'id')->latestOfMany();
+    }
+
+    public function contact()
+    {
+        return $this->hasOne(Contact::class, 'acquaintance_id', 'id')->where('user_id', auth()->id()); 
     }
 }

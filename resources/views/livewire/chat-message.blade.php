@@ -21,7 +21,7 @@
                         {{-- <img class="w-8 h-8 rounded-full" src="https://avatars.githubusercontent.com/u/167683279?v=4" alt="Jese image"> --}}
                         <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-4  {{ $row->sender_id==auth()->id() ? 'rounded-s-xl rounded-br-xl border-green-200 bg-green-100 dark:bg-green-700' : 'rounded-e-xl rounded-es-xl border-gray-200 bg-gray-100 dark:bg-gray-700' }}">
                             <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ optional($row->sender)->name }}</span>
+                                {{-- <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ optional($row->sender)->name }}</span> --}}
                                 <span class="text-sm font-normal text-gray-500 dark:text-gray-300">
                                     @if (\Carbon\Carbon::parse($row->timestamp)->isToday())
                                         {{ \Carbon\Carbon::parse($row->timestamp)->format('H:i') }}
@@ -32,8 +32,8 @@
                             </div>
                             @if($row->parent)
                                 <div class="mt-1 flex justify-between bg-gray-50 dark:bg-gray-800">
-                                    <blockquote class="break-all p-2 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 {{ $row->sender_id==auth()->id() ? 'dark:bg-gray-700' : 'dark:bg-gray-800' }}">
-                                        <span class="text-xs text-gray-900 dark:text-green-400">{{ $row->parent->sender->name==auth()->user()->name ? "You" : $row->parent->sender->name }}</span>
+                                    <blockquote class="break-all w-full p-2 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 {{ $row->sender_id==auth()->id() ? 'dark:bg-gray-700' : 'dark:bg-gray-800' }}">
+                                        <span class="text-xs text-gray-900 dark:text-green-400">{{ $row->parent->sender->name==auth()->user()->name ? "You" : $row->parent->sender?->contact->alias_name ?? $row->parent->sender?->email }}</span>
                                         
                                         @if($row->parent->message_type == 'Document')
                                             <a href="{{ $row->parent->fileUrl() }}" target="_blank" class="flex text-sm text-blue-600 dark:text-blue-400 hover:underline">
