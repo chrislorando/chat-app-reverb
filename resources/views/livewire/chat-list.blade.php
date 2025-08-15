@@ -67,9 +67,9 @@
                 </form>
 
             
-                <a href="$" class=" text-green-800 text-sm font-medium me-2 px-3 py-1 rounded-full dark:text-green-300 border border-green-400">All</a>
+                <button type="button" wire:click.prevent="$set('filter', null)" class=" text-green-800 text-sm font-medium me-2 px-3 py-1 rounded-full dark:text-green-300 border border-green-400 {{ $filter==null ? 'dark:bg-green-900 bg-green-100' : '' }}">All</button>
 
-                <a href="$" class=" text-green-800 text-sm font-medium me-2 px-3 py-1 rounded-full dark:text-green-300 border border-green-400">Unread</a>
+                <button type="button" wire:click.prevent="$set('filter', 'Unread')" class=" text-green-800 text-sm font-medium me-2 px-3 py-1 rounded-full dark:text-green-300 border border-green-400 {{ $filter=='Unread' ? 'dark:bg-green-900 bg-green-100' : '' }}">Unread</button>
 
 
             </div>

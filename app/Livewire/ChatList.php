@@ -13,15 +13,12 @@ use App\Models\User;
 class ChatList extends Component
 {
     private $models;
-
     public $search;
-
     public $isActiveChat;
-
     public $perPage = 10;
-
     public $uid;
     public $isAddContactOpen = false;
+    public $filter;
     
 
     public function loadMore()
@@ -86,7 +83,7 @@ class ChatList extends Component
 
         $mergedContact = $contacts->merge($existChatUser)->unique()->values();
 
-        $this->models = User::whereIn('id', $mergedContact)
+        $query = User::whereIn('id', $mergedContact)
         ->when($this->search != '', function ($query) {
             $query->where(function ($q) {
                 $q->where('name', 'like', '%' . $this->search . '%')
@@ -98,11 +95,22 @@ class ChatList extends Component
         ->withCount(['sentMessages as unread_messages_count' => function (Builder $query) use ($authId) {
             $query->where('receiver_id', $authId)
                   ->where('read_status', 'Unread');
-        }])
+        }]);
+        // ->when($this->filter === 'Unread', function ($query) {
+        //     $query->having('unread_messages_count', '>', 0);
+        // })
         // ->with(['latestMessage'])
-        ->limit(10)
-        ->paginate($this->perPage);  
+        // ->limit(10)
+        // ->paginate($this->perPage);  
 
+        if ($this->filter === 'Unread') {
+            $query->whereHas('sentMessages', function ($q) use ($authId) {
+                $q->where('receiver_id', $authId)
+                ->where('read_status', 'Unread');
+            });
+        }
+
+        $this->models = $query->limit(10)->paginate($this->perPage);
 
         $this->models->setCollection(
             $this->models->getCollection()->map(function ($user) use ($authId) {
