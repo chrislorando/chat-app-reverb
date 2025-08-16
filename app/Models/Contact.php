@@ -13,7 +13,8 @@ class Contact extends Model
     protected $fillable = [
         'alias_name',
         'user_id',
-        'acquaintance_id'
+        'acquaintance_id',
+        'is_pinned'
     ];
 
     public function owner()

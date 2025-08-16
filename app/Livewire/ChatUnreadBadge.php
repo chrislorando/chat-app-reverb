@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Message;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ChatUnreadBadge extends Component
@@ -38,6 +39,12 @@ class ChatUnreadBadge extends Component
             }
             
         }
+    }
+
+    #[On('refresh-badge')]
+    public function refreshBadge()
+    {
+        $this->dispatch('$refresh');
     }
 
     public function render()

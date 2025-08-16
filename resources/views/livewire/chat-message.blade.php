@@ -151,7 +151,7 @@
                                 {{-- {{ $row->content }} --}}
                                 {!! preg_replace_callback(
                                     '/(https?:\/\/[^\s]+)/',
-                                    fn($match) => '<a href="' . e($match[0]) . '" target="_blank" class="text-blue-500 underline" target="_blank" rel="noopener noreferrer">' . e($match[0]) . '</a>',
+                                    fn($match) => '<a href="' . e($match[0]) . '" target="_blank" class="text-green-400 underline" target="_blank" rel="noopener noreferrer">' . e($match[0]) . '</a>',
                                     nl2br(e($row->content))
                                 ) !!}
                             </p>

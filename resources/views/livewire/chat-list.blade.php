@@ -78,9 +78,9 @@
                 @php($i=0)
                 @foreach($models as $row)
                 @php($i++)
-                    <li wire:key='{{ $row->id }}' class="py-3 sm:py-4 {{ $isActiveChat==$row->id ? 'bg-slate-700' : '' }} px-3 cursor-pointer">
+                    <li wire:key='{{ $row->id }}' class="flex items-center justify-between  group text-gray-900  dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group py-3 sm:py-4 {{ $isActiveChat==$row->id ? 'bg-slate-700' : '' }} px-3 cursor-pointer">
                         <a 
-                        class="flex items-center" 
+                        class="flex items-center w-full" 
                         data-drawer-target="drawer-navigation"
                         data-drawer-hide="drawer-navigation"
                         data-drawer-backdrop="false"
@@ -155,6 +155,54 @@
                                 <livewire:chat-unread-badge :senderId="$row->id" :authId="auth()->id()" :wire:key="'badge-'.$row->id" />
                             </div>
                         </a>
+
+                        @if($row->contact->is_pinned)
+                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v4.997a.31.31 0 0 1-.068.113c-.08.098-.213.207-.378.301-.947.543-1.713 1.54-2.191 2.488A6.237 6.237 0 0 0 4.82 14.4c-.1.48-.138 1.031.018 1.539C5.12 16.846 6.02 17 6.414 17H11v3a1 1 0 1 0 2 0v-3h4.586c.395 0 1.295-.154 1.575-1.061.156-.508.118-1.059.017-1.539a6.241 6.241 0 0 0-.541-1.5c-.479-.95-1.244-1.946-2.191-2.489a1.393 1.393 0 0 1-.378-.301.309.309 0 0 1-.068-.113V5h1a1 1 0 1 0 0-2H7a1 1 0 1 0 0 2h1Z"/>
+                            </svg>
+                        @endif
+
+                        <div class="flex items-center group" x-transition >
+                            <button x-transition 
+                                id="dropdown-chat-list-button-{{ $row->id }}" 
+                                data-dropdown-toggle="dropdown-chat-list-{{ $row->id }}" 
+                                class="hidden group-hover:inline-flex items-center justify-center ms-3 text-sm font-medium text-gray-800 dark:text-gray-300"
+                            >
+                                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M12 6h.01M12 12h.01M12 18h.01"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div id="dropdown-chat-list-{{$row->id}}" data-dropdown-placement="right" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-44 border-2 border-gray-600 dark:bg-gray-700">
+                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+                                <li>
+                                    @if(!$row->contact->is_pinned)
+                                        <button wire:click="pinChat({{$row->id}})" type="button" class="flex w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                            <svg class="w-5 h-5 me-2 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v4.997a.31.31 0 0 1-.068.113c-.08.098-.213.207-.378.301-.947.543-1.713 1.54-2.191 2.488A6.237 6.237 0 0 0 4.82 14.4c-.1.48-.138 1.031.018 1.539C5.12 16.846 6.02 17 6.414 17H11v3a1 1 0 1 0 2 0v-3h4.586c.395 0 1.295-.154 1.575-1.061.156-.508.118-1.059.017-1.539a6.241 6.241 0 0 0-.541-1.5c-.479-.95-1.244-1.946-2.191-2.489a1.393 1.393 0 0 1-.378-.301.309.309 0 0 1-.068-.113V5h1a1 1 0 1 0 0-2H7a1 1 0 1 0 0 2h1Z"/>
+                                            </svg>
+                                            Pin chat
+                                        </button>
+                                    @else
+                                        <button wire:click="unpinChat({{$row->id}})" type="button" class="w-full text-left flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                            <svg class="w-5 h-5 me-2 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                                <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M12.0001 20v-4M7.00012 4h9.99998M9.00012 5v5c0 .5523-.46939 1.0045-.94861 1.279-1.43433.8217-2.60135 3.245-2.25635 4.3653.07806.2535.35396.3557.61917.3557H17.5859c.2652 0 .5411-.1022.6192-.3557.3449-1.1204-.8221-3.5436-2.2564-4.3653-.4792-.2745-.9486-.7267-.9486-1.279V5c0-.55228-.4477-1-1-1h-4c-.55226 0-.99998.44772-.99998 1Z"/>
+                                            </svg>
+                                            Unpin chat
+                                        </button>
+                                    @endif
+                                </li>
+                                <li>
+                                    <button wire:click="markAsRead({{$row->id}})" type="button" class="w-full text-left flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                        <svg class="w-5 h-5 me-2 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 9h5m3 0h2M7 12h2m3 0h5M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-6.616a1 1 0 0 0-.67.257l-2.88 2.592A.5.5 0 0 1 8 18.477V17a1 1 0 0 0-1-1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"/>
+                                        </svg>
+                                        Mark as read
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
                 @endforeach
                 

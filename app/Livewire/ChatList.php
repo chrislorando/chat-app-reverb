@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Events\MessageSent;
 use App\Livewire\Actions\Logout;
 use App\Models\Contact;
 use App\Models\Message;
@@ -61,6 +62,33 @@ class ChatList extends Component
         $this->dispatch('$refresh');
     }
 
+    public function pinChat($userId)
+    {
+        Contact::where('acquaintance_id', $userId)->update(['is_pinned' => true]);
+
+        $this->dispatch('refresh-list');
+    }
+
+    public function unpinChat($userId)
+    {
+        Contact::where('acquaintance_id', $userId)->update(['is_pinned' => false]);
+
+        $this->dispatch('refresh-list');
+    }
+
+    public function markAsRead($userId)
+    {
+        Message::where('receiver_id', auth()->id())
+        ->where('sender_id', $userId)
+        ->update([
+            'read_status'=> 'Read',
+            'updated_at' => now()
+        ]);
+
+        event(new MessageSent(auth()->id(), $userId, true));
+        $this->dispatch('refresh-list');
+    }
+
     // #[On('read-chat')] 
     public function render()
     {
@@ -95,7 +123,26 @@ class ChatList extends Component
         ->withCount(['sentMessages as unread_messages_count' => function (Builder $query) use ($authId) {
             $query->where('receiver_id', $authId)
                   ->where('read_status', 'Unread');
-        }]);
+        }])
+        ->addSelect([
+            'latest_message_created_at' => Message::select('created_at')
+                ->where(function ($q) use ($authId) {
+                    $q->whereColumn('sender_id', 'users.id')
+                    ->where('receiver_id', $authId);
+                })
+                ->orWhere(function ($q) use ($authId) {
+                    $q->whereColumn('receiver_id', 'users.id')
+                    ->where('sender_id', $authId);
+                })
+                ->latest()
+                ->limit(1),
+            'is_pinned' => Contact::select('is_pinned')
+                ->whereColumn('acquaintance_id', 'users.id')
+                ->where('user_id', $authId)
+                ->limit(1),
+        ])
+        ->orderByDesc('is_pinned')
+        ->orderByDesc('latest_message_created_at');
         // ->when($this->filter === 'Unread', function ($query) {
         //     $query->having('unread_messages_count', '>', 0);
         // })
@@ -127,6 +174,7 @@ class ChatList extends Component
                 return $user;
             })
         );
+        
         return view('livewire.chat-list', [
             'models' => $this->models
         ]);

@@ -157,6 +157,7 @@ class ChatMessage extends Component
 
         event(new PushMessage($this->userId1, $this->userId2, $this->message));
         event(new MessageSent($this->uid, auth()->id()));
+        $this->dispatch('refresh-list')->to(ChatList::class);
 
         // $this->closeUploadDrawer();
         $this->reset([
