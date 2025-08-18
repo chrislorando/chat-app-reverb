@@ -7,6 +7,7 @@ use App\Events\PushMessage;
 use App\Events\UserOnline;
 use App\Events\UserTyping;
 use App\Models\User;
+use App\Notifications\PushMessageBrowser;
 use Illuminate\Support\Facades\Broadcast;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Renderless;
@@ -158,6 +159,10 @@ class ChatMessage extends Component
         event(new PushMessage($this->userId1, $this->userId2, $this->message));
         event(new MessageSent($this->uid, auth()->id()));
         $this->dispatch('refresh-list')->to(ChatList::class);
+
+        $receiver = User::find($this->uid);
+        $aliasOfMe = $receiver->contactAlias(auth()->id())->first()?->alias_name ?? auth()->user()->name;
+        $receiver->notify(new PushMessageBrowser(auth()->user()->avatar_image, $aliasOfMe, $this->message));
 
         // $this->closeUploadDrawer();
         $this->reset([

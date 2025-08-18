@@ -1,4 +1,4 @@
-<div x-data="{ showDeleteModal: false, confirmDeleteId: null }">
+<div x-data="{ showDeleteModal: false, confirmDeleteId: null }" >
     @if($showChat)
         <livewire:chat-header :senderId="$userModel->id" :authId="auth()->id()" :wire:key="'chat-'.$userModel->id" />
 
@@ -377,7 +377,7 @@
                             <input wire:model='targetMessageId' type="hidden" class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="false" />
                         
                             @if (!$photo || !$document) 
-                                <textarea wire:ignore required
+                                <textarea wire:ignore required focus
                                     type="text" 
                                     id="message" 
                                     key="{{ now()->timestamp }}"
@@ -393,7 +393,7 @@
                                     x-data="{ resize() { $el.style.height = 'auto'; $el.style.height = Math.min($el.scrollHeight, 120) + 'px'; } }"
                                     x-init="
                                         resize(); 
-                                        $watch('$wire.message', () => resize())
+                                        $watch('$wire.message', () => resize());
                                     "
                                     x-on:input="resize()"
                                     x-on:keydown.enter="if (!event.shiftKey) { event.preventDefault(); $wire.send(); }"
@@ -497,6 +497,9 @@
                 </div>
             </div>
         </section>
+
+        {{-- <a wire:navigate href="{{route('push')}}" class="btn btn-outline-primary btn-block">Make a Push Notification!</a> --}}
+
 
     </main>
 
@@ -656,6 +659,9 @@
         //     })
 
         setTimeout(function() {
+            setTimeout(() => {
+                document.getElementById('message').focus()
+            }, 100)
             document.getElementById("message_last").scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });          
             initDropdowns();
             initFlowbite();

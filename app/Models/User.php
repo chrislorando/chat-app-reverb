@@ -6,10 +6,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasPushSubscriptions;
 
     /**
      * The attributes that are mass assignable.
@@ -35,6 +36,7 @@ class User extends Authenticatable
 
     public $appends = [
         'initials',
+        'avatar_image',
         'avatar_color',
         'avatar',
         'alias_name'
@@ -94,6 +96,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function getAvatarImageAttribute()
+    {
+        return 'https://avatar.iran.liara.run/public/'.$this->id;
+    }
+
     public function unreadMessages()
     {
         return $this->hasMany(Message::class, 'receiver_id', 'id')->where('read_status', 'Unread');
@@ -112,5 +119,11 @@ class User extends Authenticatable
     public function contact()
     {
         return $this->hasOne(Contact::class, 'acquaintance_id', 'id')->where('user_id', auth()->id()); 
+    }
+
+    public function contactAlias($acquaintanceId)
+    {
+        return $this->hasOne(Contact::class, 'user_id', 'id')
+            ->where('acquaintance_id', $acquaintanceId);
     }
 }

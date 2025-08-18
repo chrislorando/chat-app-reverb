@@ -48,6 +48,8 @@
  setTimeout(function() {
     initFlowbite() 
 }, 500);
+
+window.VAPID_PUBLIC_KEY = "{{ env('VAPID_PUBLIC_KEY') }}";
 </script>
 
 </html>
