@@ -86,3 +86,6 @@ A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind C
 
 ## Demo Link
    Coming soon
+
+## Credits
+https://avatar-placeholder.iran.liara.run/avatars
