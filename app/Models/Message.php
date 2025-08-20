@@ -18,6 +18,7 @@ class Message extends Model
         'delivery_status',
         'read_status',
         'message_type',
+        'interaction_type',
         'file_name',
         'file_size',
         'file_url',

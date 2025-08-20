@@ -6,6 +6,7 @@ use App\Events\MessageSent;
 use App\Events\PushMessage;
 use App\Events\UserOnline;
 use App\Events\UserTyping;
+use App\Models\Contact;
 use App\Models\User;
 use App\Notifications\PushMessageBrowser;
 use Illuminate\Support\Facades\Broadcast;
@@ -47,6 +48,9 @@ class ChatMessage extends Component
     public $cameraImage;
     public $showCamera = false;
     public $cameraStream;
+    public $contactList = [];
+    public $searchContact = '';
+    public $selectedContacts = [];
 
     public function mount()
     {
@@ -113,6 +117,7 @@ class ChatMessage extends Component
             'receiver_id'=> $this->uid,
             'parent_id'=> $this->targetMessageId,
             'content' => $this->message,
+            'interaction_type' => $this->targetMessageId ? 'Reply' : null,
             'timestamp' => now()
         ];
 
@@ -315,7 +320,7 @@ class ChatMessage extends Component
     public function remove(Message $model)
     {
         // Hapus file jika ada file_url
-        if ($model->file_url) {
+        if ($model->file_url && $model->interaction_type == null) {
             // Ambil path relatif dari file_url
             $parsedUrl = parse_url($model->file_url, PHP_URL_PATH);
             // Misal: /chat-reverb/images/krgffGRjmyiCDWmvj7USjC76lsL9DFcN8iSs2vzR.png
@@ -351,6 +356,108 @@ class ChatMessage extends Component
     {
         event(new UserTyping(auth()->id(), $this->uid,  false));
         $this->isTyping = false;
+    }
+
+    #[On('get-contact-list')]
+    public function getContactList($targetMessageId=null)
+    {
+        // $this->targetMessageId = $targetMessageId ?? null;
+        // $this->targetMessageText = $targetMessageText ?? null;
+        $this->reply(Message::find($targetMessageId));
+
+        $this->contactList = Contact::when($this->searchContact, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('alias_name', 'like', '%' . $this->searchContact . '%')
+                      ->orWhereHas('acquaintance', function ($q) {
+                          $q->where('name', 'like', '%' . $this->searchContact . '%')
+                            ->orWhere('email', 'like', '%' . $this->searchContact . '%');
+                      });
+                });
+            })
+            ->where('user_id', auth()->id())
+            ->with('acquaintance')
+            ->orderBy('alias_name', 'asc')
+            ->get()
+            ->map(function ($contact) {
+                return [
+                    'id' => $contact->id,
+                    'acquaintance_id' => $contact->acquaintance?->id,
+                    'name' => $contact->alias_name ?: $contact->acquaintance->name,
+                    'about' => $contact->acquaintance?->about,
+                    'avatar_initials' => $contact->acquaintance?->avatar['initials'],
+                    'avatar_color' => $contact->acquaintance?->avatar['color'],
+                ];
+
+            })->toArray();
+
+    }
+
+    public function updatedSearchContact()
+    {
+        $this->getContactList();
+        // dd($this->targetMessageId, $this->targetMessageText);
+    }
+    
+    public function sendForwardMessage()
+    {
+         $this->validate([
+            'selectedContacts' => 'required',
+            'targetMessageId' => 'required',
+        ]);
+
+        $data = [];
+
+        // dd($this->targetMessageId, $this->targetMessageFileUrl);
+        foreach($this->selectedContacts as $row){
+            [$receiverId] = explode('|', $row);
+
+            $data[] = [
+                'sender_id' => auth()->id(),
+                'receiver_id' => $receiverId,
+                'parent_id' => $this->targetMessageId,
+                'content' => $this->targetMessageText,
+                'message_type' => $this->targetMessageType,
+                'file_name' => $this->targetMessageFileName,
+                'file_size' => $this->targetMessageFileSize,
+                'file_url' => $this->targetMessageFileUrl,
+                'interaction_type' => 'Forward',
+                'timestamp' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+
+            $this->userId1 = min(auth()->id(), $receiverId);
+            $this->userId2 = max(auth()->id(), $receiverId);
+
+            event(new PushMessage($this->userId1, $this->userId2, $this->targetMessageText));
+            event(new MessageSent($receiverId, auth()->id()));
+            $this->dispatch('refresh-list')->to(ChatList::class);
+
+            $receiver = User::find($receiverId);
+            $aliasOfMe = $receiver->contactAlias(auth()->id())->first()?->alias_name ?? auth()->user()->name;
+            $receiver->notify(new PushMessageBrowser(auth()->user()->avatar_image, $aliasOfMe, $this->targetMessageText));
+        }
+
+        Message::insert($data);
+
+        $this->reset([
+            'message',
+            'targetMessageId',
+            'targetMessageText',
+            'targetMessageType',
+            'targetMessageFileUrl',
+            'targetMessageFileSize',
+            'targetMessageFileName',
+            'targetSender',
+            'isTyping',
+            'photo', 
+            'document', 
+            'cameraImage'
+        ]);
+
+        $this->dispatch('save-forwarded-message');
+
+        // dd($this->selectedContacts, $this->targetMessageId, $this->targetMessageText);
     }
 
     public function render()

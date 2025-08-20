@@ -38,9 +38,12 @@
 
         <div class="antialiased bg-gray-50 dark:bg-gray-900 h-screen"> 
             {{-- <livewire:layout.navigation /> --}}
+            
             <livewire:chat-list /> 
         
             <livewire:chat-message /> 
+
+           
         </div>
     </body>
 

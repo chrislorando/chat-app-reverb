@@ -1,4 +1,4 @@
-<div x-data="{ showDeleteModal: false, confirmDeleteId: null }" >
+<div x-data="{ showDeleteModal: false, confirmDeleteId: null, showForwardModal: false, forwardMsgId: null }" >
     @if($showChat)
         <livewire:chat-header :senderId="$userModel->id" :authId="auth()->id()" :wire:key="'chat-'.$userModel->id" />
 
@@ -19,20 +19,29 @@
 
                     <div id="message{{ $row->id }}" wire:key='{{ $row->id }}' class="flex justify-end {{ $row->sender_id==auth()->id() ? '' : 'flex-row-reverse' }} flex-none gap-2.5 w-full">
                         {{-- <img class="w-8 h-8 rounded-full" src="https://avatars.githubusercontent.com/u/167683279?v=4" alt="Jese image"> --}}
-                        <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-4  {{ $row->sender_id==auth()->id() ? 'rounded-s-xl rounded-br-xl border-green-200 bg-green-100 dark:bg-green-700' : 'rounded-e-xl rounded-es-xl border-gray-200 bg-gray-100 dark:bg-gray-700' }}">
+                        <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-2  {{ $row->sender_id==auth()->id() ? 'rounded-s-xl rounded-br-xl border-green-200 bg-green-100 dark:bg-green-700' : 'rounded-e-xl rounded-es-xl border-gray-200 bg-gray-100 dark:bg-gray-700' }}">
                             <div class="flex items-center space-x-2 rtl:space-x-reverse">
                                 {{-- <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ optional($row->sender)->name }}</span> --}}
-                                <span class="text-sm font-normal text-gray-500 dark:text-gray-300">
+                                @if($row->interaction_type == 'Forward')
+                                    <span class="flex text-sm font-normal italic {{ $row->sender_id==auth()->id() ? 'text-gray-400' : 'text-gray-500' }}">
+                                        <svg class="w-4 h-4 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M5.027 10.9a8.729 8.729 0 0 1 6.422-3.62v-1.2A2.061 2.061 0 0 1 12.61 4.2a1.986 1.986 0 0 1 2.104.23l5.491 4.308a2.11 2.11 0 0 1 .588 2.566 2.109 2.109 0 0 1-.588.734l-5.489 4.308a1.983 1.983 0 0 1-2.104.228 2.065 2.065 0 0 1-1.16-1.876v-.942c-5.33 1.284-6.212 5.251-6.25 5.441a1 1 0 0 1-.923.806h-.06a1.003 1.003 0 0 1-.955-.7A10.221 10.221 0 0 1 5.027 10.9Z"/>
+                                        </svg>
+                                        Forwarded
+                                    </span>
+                                @endif
+                                {{-- <span class="text-xs font-normal text-gray-500 dark:text-gray-300">
                                     @if (\Carbon\Carbon::parse($row->timestamp)->isToday())
                                         {{ \Carbon\Carbon::parse($row->timestamp)->format('H:i') }}
                                     @else
                                         {{ \Carbon\Carbon::parse($row->timestamp)->format('d M Y H:i') }}
                                     @endif
-                                </span>
+                                </span> --}}
+                               
                             </div>
-                            @if($row->parent)
-                                <div class="mt-1 flex justify-between bg-gray-50 dark:bg-gray-800">
-                                    <blockquote class="break-all w-full p-2 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 {{ $row->sender_id==auth()->id() ? 'dark:bg-gray-700' : 'dark:bg-gray-800' }}">
+                            @if($row->parent && $row->interaction_type == 'Reply')
+                                <div class="mt-1 flex justify-between ">
+                                    <blockquote class="break-all w-full p-2 border-s-4 rounded border-gray-300 bg-gray-50 dark:border-gray-500 {{ $row->sender_id==auth()->id() ? 'dark:bg-gray-700' : 'dark:bg-gray-800' }}">
                                         <span class="text-xs text-gray-900 dark:text-green-400">{{ $row->parent->sender->name==auth()->user()->name ? "You" : $row->parent->sender?->contact->alias_name ?? $row->parent->sender?->email }}</span>
                                         
                                         @if($row->parent->message_type == 'Document')
@@ -62,7 +71,7 @@
                                     {{-- <a href="{{ $row->fileUrl() }}" target="_blank" class="py-2">
                                         <img src="{{ $row->fileUrl() }}" class="h-auto rounded-lg" alt="{{ $row->file_name }}" />
                                     </a> --}}
-                                    <div class="group relative my-2.5">
+                                    <div class="group relative my-1">
                                         <div class="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
                                             <a href="{{ $row->fileUrl() }}" download="{{ $row->file_name }}" data-tooltip-target="download-image" class="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50">
                                                 <svg class="w-5 h-5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
@@ -83,7 +92,7 @@
                                         </svg>
                                         {{ $row->file_name }} ({{ $row->file_size }} kB)
                                     </a> --}}
-                                    <div class="flex justify-between items-start my-2.5 bg-gray-50 {{ $row->sender_id==auth()->id() ? 'dark:bg-green-800' : 'dark:bg-gray-600' }} rounded-xl p-2 w-full">
+                                    <div class="flex justify-between items-start my-1 bg-gray-50 {{ $row->sender_id==auth()->id() ? 'dark:bg-green-800' : 'dark:bg-gray-600' }} rounded-xl p-2 w-full">
                                         <div class="me-2">
                                             <span class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white pb-2">
                                                 @php
@@ -156,19 +165,28 @@
                                 ) !!}
                             </p>
                             
-                            <div class="flex justify-end">
-                                <span class="text-sm font-normal text-gray-500 dark:text-gray-300">
+                            <div class="flex justify-end space-x-2">
+                                <span class="text-xs font-normal text-gray-500 dark:text-gray-300">
+                                    @if (\Carbon\Carbon::parse($row->timestamp)->isToday())
+                                        {{ \Carbon\Carbon::parse($row->timestamp)->format('H:i') }}
+                                    @else
+                                        {{ \Carbon\Carbon::parse($row->timestamp)->format('d M Y H:i') }}
+                                    @endif
+                                </span>
+
+                                <span class="text-xs font-normal text-gray-500 dark:text-gray-300">
                                     @if($row->read_status == 'Unread')
-                                        <svg class="w-[20px] h-[20px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                                         </svg>
                                     @else
-                                        <svg class="w-[20px] h-[20px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                             <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z" clip-rule="evenodd"/>
                                         </svg>
 
                                     @endif
                                 </span>
+                                
                             </div>
                       
                         </div>
@@ -177,21 +195,47 @@
                                 <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
                             </svg>
                         </button>
-                        <div id="dropdownDots{{ $row->id }}" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-40 dark:bg-gray-800 dark:divide-gray-800">
+                        <div id="dropdownDots{{ $row->id }}" class="z-50 hidden bg-white divide-y  rounded-lg shadow-lg w-40 dark:bg-gray-800  divide-gray-600">
                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton{{ $row->id }}">
                                 <li>
-                                    <button type="button" wire:click='reply({{ $row->id }})' @click='document.getElementById("message").focus();' class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Reply</button>
+                                    <button type="button" wire:click='reply({{ $row->id }})' @click='document.getElementById("message").focus(); showForwardModal:false' class="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                        <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.5 8.046H11V6.119c0-.921-.9-1.446-1.524-.894l-5.108 4.49a1.2 1.2 0 0 0 0 1.739l5.108 4.49c.624.556 1.524.027 1.524-.893v-1.928h2a3.023 3.023 0 0 1 3 3.046V19a5.593 5.593 0 0 0-1.5-10.954Z"/>
+                                        </svg>
+
+                                        <span>Reply</span>
+                                    </button>
                                 </li>
                                 <li>
                                     <button 
+                                    type="button" 
+                                    data-modal-target="forward-modal" 
+                                    data-modal-toggle="forward-modal"
+                                    @click="$dispatch('get-contact-list', { targetMessageId: {{$row->id}} }); showForwardModal = true"
+                                    class="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                        <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.248 19C3.22 15.77 5.275 8.232 12.466 8.232V6.079a1.025 1.025 0 0 1 1.644-.862l5.479 4.307a1.108 1.108 0 0 1 0 1.723l-5.48 4.307a1.026 1.026 0 0 1-1.643-.861v-2.154C5.275 13.616 4.248 19 4.248 19Z"/>
+                                        </svg>
+                                        <span>Forward</span>
+                                    </button>
+                                </li>
+                                
+                            </ul>
+                            <div class="ms-3 py-2 {{ $row->sender_id==auth()->id() ? 'block' : 'hidden'}}">
+                                <button 
                                     type="button" 
                                     data-modal-target="delete-modal" 
                                     data-modal-toggle="delete-modal"
                                     {{-- wire:click='remove({{ $row->id }})'  --}}
                                     @click="confirmDeleteId = {{ $row->id }}; showDeleteModal = true"
-                                    class="{{ $row->sender_id==auth()->id() ? 'block' : 'hidden' }} block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Delete</button>
-                                </li>
-                            </ul>
+                                    class="{{ $row->sender_id==auth()->id() ? 'block' : 'hidden' }} flex items-center gap-2 w-full text-left px-1 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-white">
+                                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
+                                    </svg>
+
+                                    <span>Delete</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 @endforeach
@@ -201,43 +245,55 @@
         </main>
 
         <footer class="bg-gray-800 shadow fixed bottom-0 md:left-96 left-0 right-0 md:z-20 z-10 p-2" style=" transform: none !important;">
-                <form wire:submit.prevent='send'>  
+                <form wire:submit.prevent='send' 
+                x-data 
+                x-on:submit="window.dispatchEvent(new CustomEvent('close-picker'))">  
 
-                    @if($targetMessageId)
+                    @if($targetMessageId && count($selectedContacts) == 0)
                         <div class="flex justify-between">
-                            <blockquote class="p-2 my-2 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs text-gray-900 dark:text-green-400">{{ $targetSender==auth()->user()->name ? "You" : $targetSender }}</span>
-                                    <button wire:click='clearReply' type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="default-modal">
-                                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                                        </svg>
-                                        <span class="sr-only">Close modal</span>
-                                    </button>
-                                </div>
-                            
-                                <div class="flex justify-between">
-                                    @if($targetMessageType == 'Document')
-                                        <svg class="w-5 h-5 mr-1 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
-                                        </svg>
+                            <blockquote class="relative w-full text-left rounded p-2 mt-2 mb-3 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-700">
+                                <div class="flex items-start justify-between">
+                                    <!-- Bagian kiri: sender + text -->
+                                    <div class="flex-1">
+                                        <span class="block text-xs text-gray-900 dark:text-green-400">
+                                            {{ $targetSender==auth()->user()->name ? "You" : $targetSender }}
+                                        </span>
 
-                                        <p id="targetMessage" class="text-sm text-gray-900 dark:text-white">
-                                            {{ $targetMessageFileName }} {{ '(' . $targetMessageFileSize . ' kB) ' }}<br />
-                                            {{ $targetMessageText }}
-                                        </p>
-                                    @else
-                                        <p id="targetMessage" class="text-sm text-gray-900 dark:text-white">
-                                            {{ $targetMessageText }}
-                                        </p>
-                                    @endif
-                                    
+                                        <div class="flex items-start gap-2 mt-1">
+                                            @if($targetMessageType == 'Document')
+                                                <svg class="w-5 h-5 mr-1 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
+                                                </svg>
+                                                <p id="targetMessage" class="text-sm text-gray-900 dark:text-white">
+                                                    {{ $targetMessageFileName }} {{ '(' . $targetMessageFileSize . ' kB) ' }}<br />
+                                                    {{ $targetMessageText }}
+                                                </p>
+                                            @else
+                                                <p id="targetMessage" class="text-sm text-gray-900 dark:text-white">
+                                                    {{ $targetMessageText }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <!-- Bagian kanan: image + close -->
+                                    <div class="flex items-start gap-2 ml-2">
+                                        @if($targetMessageType == 'Image')
+                                            <img src="{{ $targetMessageFileUrl }}" class="h-12 w-12 object-cover rounded-lg" />
+                                        @endif
+
+                                        <button wire:click='clearReply' type="button"
+                                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                            </svg>
+                                            <span class="sr-only">Close</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </blockquote>
 
-                            @if($targetMessageType == 'Image')
-                                <img src="{{ $targetMessageFileUrl }}" class="h-auto w-14 rounded-lg py-2" />
-                            @endif
                         </div>
                     @endif
 
@@ -292,8 +348,8 @@
                                 wire:keydown.debounce.1500ms="notTyping" --}}
                                 type="text" 
                                 id="message-upload" 
-                                class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="off" />
-                            <button type="submit" class="text-white absolute end-2.5 bottom-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Send</button>
+                                class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:gray-blue-500 dark:focus:border-gray-500" placeholder="Type a message" autocomplete="off" />
+                            <button type="submit" class="text-white absolute end-2.5 bottom-2 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Send</button>
                         </div>
                     </div>
 
@@ -310,12 +366,13 @@
                             showPicker: false,
                             insertEmoji(e) {
                                 $wire.addEmoji(e.detail.unicode);
-                                this.showPicker = false;
+                                {{-- this.showPicker = false; --}}
                             }
                         }"
                         @emoji-click="insertEmoji"
                         @click.outside="showPicker = false"
-                        @keydown.escape.window="showPicker = false">
+                        @keydown.escape.window="showPicker = false"
+                        @close-picker.window="showPicker = false">
 
                         <button wire:loading.attr="disabled" id="dropdownTopButton" data-dropdown-toggle="dropdownTop" data-dropdown-offset-distance="10" data-dropdown-offset-skidding="74" data-dropdown-placement="top" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center" type="button">
                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -364,7 +421,7 @@
                         <emoji-picker 
                             x-show="showPicker" 
                             x-transition 
-                            class="absolute w-full bottom-16 z-50 mt-2 shadow-lg bg-white dark:bg-gray-800 border rounded-lg"
+                            class="absolute w-full bottom-16 z-50 mt-2 shadow-lg bg-white dark:bg-gray-800 border-gray-600 rounded-xl"
                         ></emoji-picker>
 
                         <div class="flex-1 relative">
@@ -381,7 +438,7 @@
                                     type="text" 
                                     id="message" 
                                     key="{{ now()->timestamp }}"
-                                    class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none overflow-hidden" 
+                                    class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500 resize-none overflow-hidden" 
                                     style="min-height: 40px; max-height: 120px;"
                                     rows="1"
                                     placeholder="Type a message"
@@ -396,10 +453,10 @@
                                         $watch('$wire.message', () => resize());
                                     "
                                     x-on:input="resize()"
-                                    x-on:keydown.enter="if (!event.shiftKey) { event.preventDefault(); $wire.send(); }"
+                                    x-on:keydown.enter="if (!event.shiftKey) { event.preventDefault(); $wire.send(); window.dispatchEvent(new CustomEvent('close-picker')); }"
                                     >
                                 </textarea>
-                                <button type="submit" @disabled(empty($message)) class="text-white absolute end-2.5 bottom-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Send</button>
+                                <button type="submit" @disabled(empty($message)) class="text-white absolute end-2.5 bottom-2 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Send</button>
                             @endif
                         </div>
                     </div>
@@ -429,6 +486,104 @@
                             </button>
                             <button @click="showModal = false" data-modal-hide="delete-modal" type="button" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">No, cancel</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forward modal -->
+            <div x-show="showForwardModal"
+                x-cloak
+                @keydown.escape.window="showForwardModal = false; $wire.set('selectedContacts', []); $wire.set('targetMessageId', null);"
+                x-transition 
+                data-modal-backdrop="static"
+                x-on:save-forwarded-message="showForwardModal = false;"
+                id="forward-modal" tabindex="-1" aria-hidden="true" class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                <div class="relative p-4 w-full max-w-md  max-h-full">
+                    <!-- Modal content -->
+                    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+                        <!-- Modal header -->
+                        <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
+                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                                Forward message to
+                            </h3>
+                            <button @click="showForwardModal = false; $wire.set('selectedContacts', []); $wire.set('targetMessageId', null);" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="forward-modal">
+                                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                </svg>
+                                <span class="sr-only">Close modal</span>
+                            </button>
+                        </div>
+                        
+                        <form wire:submit.prevent='sendForwardMessage'>
+                            <!-- Modal body -->
+                            <div class="p-4 md:p-5 flex flex-col h-[400px]"> 
+                                <!-- Input fixed di atas -->
+                                <div class="mb-2">
+                                    <input wire:model.live='searchContact' 
+                                        type="text" 
+                                        name="forward_to" 
+                                        id="forward_to" 
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
+                                        placeholder="Search name or email" 
+                                        autocomplete="off" />
+                                </div>
+
+                                <!-- Scrollable list -->
+                                <div class="flex-1 overflow-y-auto">
+                                    <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        @foreach($contactList as $c)
+                                            <li class="py-1">
+                                                <label class="flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white cursor-pointer">
+                                                    
+                                                    <!-- Checkbox -->
+                                                    <input type="checkbox" 
+                                                        value="{{ $c['acquaintance_id'].'|'.$c['name'] }}" 
+                                                        wire:model.live="selectedContacts" 
+                                                        class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" />
+                                                    
+                                                    <!-- Avatar -->
+                                                    <div class="flex-shrink-0 ms-3">
+                                                        <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $c['avatar_color'] }}">
+                                                            <span class="text-xs font-medium text-white">
+                                                                {{ $c['avatar_initials'] }} 
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Name + About -->
+                                                    <div class="flex-1 min-w-0 ms-4">
+                                                        <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                            {{$c['name']}}
+                                                        </p>
+                                                        <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                                                            {{$c['about']}}
+                                                        </p>
+                                                    </div>
+                                                </label>
+                                            </li>
+                                        @endforeach
+
+                                        
+                                    </ul>
+                                </div>
+                            </div>
+
+                            @if(count($selectedContacts)>0)
+                                <!-- Modal footer -->
+                                <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                                    <div class="flex flex-wrap gap-2 flex-1 text-sm">
+                                        @foreach($selectedContacts as $item)
+                                            <span class="px-2 py-1 bg-gray-600 text-white rounded text-sm">
+                                                {{ explode('|', $item)[1] ?? '' }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                    <button wire:loading.attr="disabled" type="submit" @click="showForwardModal = false; document.querySelectorAll('[modal-backdrop]').forEach(el => el.remove());document.body.classList.remove('overflow-hidden');" data-modal-hide="forward-modal" class="ml-4 text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                                        Send
+                                    </button>
+                                </div>
+                            @endif
+                        </form>
                     </div>
                 </div>
             </div>
@@ -477,12 +632,12 @@
         </div>
     </header>
     
-    <main class="md:ml-96 h-auto pt-14 bg-gray-900">
+    <main class="md:ml-96 min-h-screen pt-14 bg-gray-900 pattern-grid">
 
-        <section class="bg-white dark:bg-gray-900">
+        <section class="bg-white dark:bg-gray-900 pattern-grid">
             <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
-                <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">We invest in the world’s potential</h1>
-                <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-400">Here at Flowbite we focus on markets where technology, innovation, and capital can unlock long-term value and drive economic growth.</p>
+                <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Use ChatsApp for free</h1>
+                <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-400">Here at ChatsApp we focus on markets where technology, innovation, and capital can unlock long-term value and drive economic growth.</p>
                 <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
                     <a href="#"
                     data-drawer-target="drawer-navigation"
@@ -500,10 +655,28 @@
 
         {{-- <a wire:navigate href="{{route('push')}}" class="btn btn-outline-primary btn-block">Make a Push Notification!</a> --}}
 
-
+       
     </main>
 
     @endif
+
+     <div wire:offline>
+        <div id="toast-danger" class="z-50 fixed bottom-5 right-5 flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800" role="alert">
+            <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
+                </svg>
+                <span class="sr-only">Error icon</span>
+            </div>
+            <div class="ms-3 text-sm font-normal">You are now offline. Please check your internet connection.</div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-danger" aria-label="Close">
+                <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+            </button>
+        </div>
+     </div>
 </div>
 
 @script
