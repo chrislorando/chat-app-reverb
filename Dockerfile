@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libsqlite3-dev \
-    supervisor \
+    # supervisor \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js (alternative method)
@@ -52,7 +52,9 @@ RUN mkdir -p storage/framework/{cache,sessions,testing,views} \
     && chmod 664 database/database.sqlite
 
 # Copy supervisord config
-COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-EXPOSE 9000 8083
-CMD ["php-fpm","/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# EXPOSE 9000 8083
+# CMD ["php-fpm","/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+EXPOSE 9000
+CMD ["php-fpm"]
