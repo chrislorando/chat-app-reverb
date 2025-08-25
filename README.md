@@ -20,6 +20,7 @@ A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind C
 
 ## Tech Stack
 - [Laravel](https://laravel.com/) — Backend framework
+- [Laravel Reverb](https://reverb.laravel.com/) — First-party WebSocket server for Laravel applications
 - [Livewire](https://livewire.laravel.com/) — Reactive components without JavaScript
 - [Alpine.js](https://alpinejs.dev/) — Lightweight JS framework for interactivity
 - [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework

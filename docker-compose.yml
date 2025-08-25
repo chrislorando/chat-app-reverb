@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chat-reverb-app-${COMPOSE_PROJECT_NAME}
+    volumes:
+      - chat-reverb-public:/var/www/public
+      - chat-reverb-conf:/var/www/docker/nginx/conf.d
+      - chat-reverb-db:/var/www/database
+    # environment:
+    #   - APP_ENV=production
+    #   - APP_DEBUG=false
+    #   - APP_URL=https://chatsapp.demolite.my.id
+    #   - DB_CONNECTION=sqlite
+    #   - DB_DATABASE=/var/www/database/database.sqlite
+    networks:
+      - chat-reverb-network
+
+  webserver:
+    image: nginx:alpine
+    container_name: chat-reverb-nginx-${COMPOSE_PROJECT_NAME}
+    ports:
+      - "8082:80"
+    volumes:
+      - chat-reverb-public:/var/www/public
+      - chat-reverb-conf:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - chat-reverb-network
+
+volumes:
+  chat-reverb-public:
+  chat-reverb-conf:
+  chat-reverb-db:
+
+networks:
+  chat-reverb-network:
+    driver: bridge

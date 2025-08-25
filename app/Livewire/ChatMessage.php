@@ -23,6 +23,7 @@ class ChatMessage extends Component
     use WithFileUploads;
 
     private $models;
+    private $newModels;
     private $oldModels;
     public User $userModel;
     public $uid;
@@ -95,6 +96,7 @@ class ChatMessage extends Component
     {
         $this->message .= $emoji;
     }
+
 
     public function send()
     {
@@ -471,18 +473,19 @@ class ChatMessage extends Component
         ->orderBy('id','desc')
         // ->latest()
         ->paginate($this->perPage);
-        
 
         if($this->uid)
         {
             $this->userModel = User::find($this->uid);
         }
       
+        
 
         #TODO: Should be moved to middleware or give some logic
         // event(new UserOnline(auth()->id(),  true));
         return view('livewire.chat-message', [
             'models' => $this->models,
+            'uid' => $this->uid,
         ]);
     }
 }

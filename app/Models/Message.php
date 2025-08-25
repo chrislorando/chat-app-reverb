@@ -10,6 +10,7 @@ class Message extends Model
     use HasFactory;
 
     protected $fillable = [
+        'id',
         'parent_id',
         'sender_id',
         'receiver_id',
@@ -22,6 +23,8 @@ class Message extends Model
         'file_name',
         'file_size',
         'file_url',
+        'created_at',
+        'updated_at',
     ];
 
     public function fileUrl()

@@ -1,4 +1,10 @@
-<div x-data="{ showDeleteModal: false, confirmDeleteId: null, showForwardModal: false, forwardMsgId: null }" >
+<div 
+x-data="{ 
+showDeleteModal: false, 
+confirmDeleteId: null, 
+showForwardModal: false, 
+forwardMsgId: null
+}">
     @if($showChat)
         <livewire:chat-header :senderId="$userModel->id" :authId="auth()->id()" :wire:key="'chat-'.$userModel->id" />
 
@@ -11,8 +17,6 @@
                     <div x-intersect.threshold.70="$wire.loadMore();$wire.dispatch('loadMore');"></div>
                     {{-- <button wire:click.prevent="loadMore" x-init='document.getElementById("old_last").scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })''>Load more</button> --}}
                 @endif
-
-              
 
                 @foreach($models->reverse()->values() as $row)
                 {{-- <div id="message_{{ $row->id }}" wire:key='{{ $row->id }}' class="flex justify-end {{ $row->sender_id==auth()->id() ? '' : 'flex-row-reverse' }} flex-none gap-2.5 w-full" x-init='document.getElementById("message_last").scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })'> --}}
@@ -239,16 +243,59 @@
                         </div>
                     </div>
                 @endforeach
+
+                <template x-if="messages[currentChannel] && messages[currentChannel].length > 0">
+                    <template x-for="m in messages[currentChannel]" :key="m?.id">
+                        <div :id="'message-' + m?.id" class="flex justify-end flex-none gap-2.5 w-full">
+                            <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-2 rounded-s-xl rounded-br-xl border-green-200 bg-green-100 dark:bg-green-700">
+                                <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                                    <span class="text-sm font-semibold text-gray-900 dark:text-white">Bonnie Green</span>
+                                    <span x-text="m?.id" class="text-sm font-normal text-gray-500 dark:text-gray-400"></span>
+                                </div>
+                                <p x-text="m?.content" class="text-sm font-normal py-2.5 text-gray-900 dark:text-white"></p>
+                                <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Sending...</span>
+                            </div>
+
+                            <button :id="'dropdownMenuIconButton-' + m?.id"
+                                    :data-dropdown-toggle="'dropdownDots'+ m?.id"
+                                    data-dropdown-placement="bottom-start"
+                                    class="inline-flex self-center items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800 dark:focus:ring-gray-600"
+                                    type="button">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
+                                    <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
+                                </svg>
+                            </button>
+
+                            <div :id="'dropdownDots'+ m?.id"
+                                class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-40 dark:bg-gray-700 dark:divide-gray-600">
+                                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                                    :aria-labelledby="'dropdownMenuIconButton-' + m?.id">
+                                    <li>
+                                        <button type="button"
+                                                @click="messages[currentChannel] = []; localStorage.setItem('messages', JSON.stringify(messages))"
+                                                class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                            Delete
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+
             </div>
 
             <div id="message_last">&nbsp;</div>
         </main>
 
         <footer class="bg-gray-800 shadow fixed bottom-0 md:left-96 left-0 right-0 md:z-20 z-10 p-2" style=" transform: none !important;">
-                <form wire:submit.prevent='send' 
+                <form 
+                wire:submit.prevent='send' 
                 x-data 
-                x-on:submit="window.dispatchEvent(new CustomEvent('close-picker'))">  
-
+                x-on:submit="window.dispatchEvent(new CustomEvent('close-picker'))"
+                >  
+             
                     @if($targetMessageId && count($selectedContacts) == 0)
                         <div class="flex justify-between">
                             <blockquote class="relative w-full text-left rounded p-2 mt-2 mb-3 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-700">
@@ -453,140 +500,145 @@
                                         $watch('$wire.message', () => resize());
                                     "
                                     x-on:input="resize()"
-                                    x-on:keydown.enter="if (!event.shiftKey) { event.preventDefault(); $wire.send(); window.dispatchEvent(new CustomEvent('close-picker')); }"
+                                    x-on:keydown.enter="if (!event.shiftKey) { 
+                                        event.preventDefault(); 
+                                        $wire.send(); 
+                                        window.dispatchEvent(new CustomEvent('close-picker')); 
+                                    }"
                                     >
                                 </textarea>
-                                <button type="submit" @disabled(empty($message)) class="text-white absolute end-2.5 bottom-2 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Send</button>
+                           
+                                <button type="submit" wire:offline.attr="disabled" @disabled(empty($message)) class="text-white absolute end-2.5 bottom-2 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                                    Send
+                                </button>
                             @endif
                         </div>
                     </div>
                 </form>
               
-            </footer>
+        </footer>
 
-            <div x-show="showDeleteModal"
-                @keydown.escape.window="showDeleteModal = false"
-                x-transition 
-                id="delete-modal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                <div class="relative p-4 w-full max-w-md max-h-full">
-                    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
-                        <button type="button" class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="delete-modal">
+        <div x-show="showDeleteModal"
+            @keydown.escape.window="showDeleteModal = false"
+            x-transition 
+            id="delete-modal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative p-4 w-full max-w-md max-h-full">
+                <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+                    <button type="button" class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="delete-modal">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                    <div class="p-4 md:p-5 text-center">
+                        <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                        </svg>
+                        <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are you sure you want to delete this message?</h3>
+                        <button @click="$wire.remove(confirmDeleteId); showModal = false" data-modal-hide="delete-modal" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
+                            Yes, I'm sure
+                        </button>
+                        <button @click="showModal = false" data-modal-hide="delete-modal" type="button" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">No, cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forward modal -->
+        <div x-show="showForwardModal"
+            x-cloak
+            @keydown.escape.window="showForwardModal = false; $wire.set('selectedContacts', []); $wire.set('targetMessageId', null);"
+            x-transition 
+            data-modal-backdrop="static"
+            x-on:save-forwarded-message="showForwardModal = false;"
+            id="forward-modal" tabindex="-1" aria-hidden="true" class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative p-4 w-full max-w-md  max-h-full">
+                <!-- Modal content -->
+                <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+                    <!-- Modal header -->
+                    <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                            Forward message to
+                        </h3>
+                        <button @click="showForwardModal = false; $wire.set('selectedContacts', []); $wire.set('targetMessageId', null);" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="forward-modal">
                             <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                             </svg>
                             <span class="sr-only">Close modal</span>
                         </button>
-                        <div class="p-4 md:p-5 text-center">
-                            <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                            </svg>
-                            <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are you sure you want to delete this message?</h3>
-                            <button @click="$wire.remove(confirmDeleteId); showModal = false" data-modal-hide="delete-modal" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
-                                Yes, I'm sure
-                            </button>
-                            <button @click="showModal = false" data-modal-hide="delete-modal" type="button" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">No, cancel</button>
-                        </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Forward modal -->
-            <div x-show="showForwardModal"
-                x-cloak
-                @keydown.escape.window="showForwardModal = false; $wire.set('selectedContacts', []); $wire.set('targetMessageId', null);"
-                x-transition 
-                data-modal-backdrop="static"
-                x-on:save-forwarded-message="showForwardModal = false;"
-                id="forward-modal" tabindex="-1" aria-hidden="true" class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                <div class="relative p-4 w-full max-w-md  max-h-full">
-                    <!-- Modal content -->
-                    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
-                        <!-- Modal header -->
-                        <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
-                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                                Forward message to
-                            </h3>
-                            <button @click="showForwardModal = false; $wire.set('selectedContacts', []); $wire.set('targetMessageId', null);" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="forward-modal">
-                                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                                </svg>
-                                <span class="sr-only">Close modal</span>
-                            </button>
-                        </div>
-                        
-                        <form wire:submit.prevent='sendForwardMessage'>
-                            <!-- Modal body -->
-                            <div class="p-4 md:p-5 flex flex-col h-[400px]"> 
-                                <!-- Input fixed di atas -->
-                                <div class="mb-2">
-                                    <input wire:model.live='searchContact' 
-                                        type="text" 
-                                        name="forward_to" 
-                                        id="forward_to" 
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
-                                        placeholder="Search name or email" 
-                                        autocomplete="off" />
-                                </div>
-
-                                <!-- Scrollable list -->
-                                <div class="flex-1 overflow-y-auto">
-                                    <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
-                                        @foreach($contactList as $c)
-                                            <li class="py-1">
-                                                <label class="flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white cursor-pointer">
-                                                    
-                                                    <!-- Checkbox -->
-                                                    <input type="checkbox" 
-                                                        value="{{ $c['acquaintance_id'].'|'.$c['name'] }}" 
-                                                        wire:model.live="selectedContacts" 
-                                                        class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" />
-                                                    
-                                                    <!-- Avatar -->
-                                                    <div class="flex-shrink-0 ms-3">
-                                                        <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $c['avatar_color'] }}">
-                                                            <span class="text-xs font-medium text-white">
-                                                                {{ $c['avatar_initials'] }} 
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <!-- Name + About -->
-                                                    <div class="flex-1 min-w-0 ms-4">
-                                                        <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                            {{$c['name']}}
-                                                        </p>
-                                                        <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                            {{$c['about']}}
-                                                        </p>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                        @endforeach
-
-                                        
-                                    </ul>
-                                </div>
+                    
+                    <form wire:submit.prevent='sendForwardMessage'>
+                        <!-- Modal body -->
+                        <div class="p-4 md:p-5 flex flex-col h-[400px]"> 
+                            <!-- Input fixed di atas -->
+                            <div class="mb-2">
+                                <input wire:model.live='searchContact' 
+                                    type="text" 
+                                    name="forward_to" 
+                                    id="forward_to" 
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
+                                    placeholder="Search name or email" 
+                                    autocomplete="off" />
                             </div>
 
-                            @if(count($selectedContacts)>0)
-                                <!-- Modal footer -->
-                                <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-                                    <div class="flex flex-wrap gap-2 flex-1 text-sm">
-                                        @foreach($selectedContacts as $item)
-                                            <span class="px-2 py-1 bg-gray-600 text-white rounded text-sm">
-                                                {{ explode('|', $item)[1] ?? '' }}
-                                            </span>
-                                        @endforeach
-                                    </div>
-                                    <button wire:loading.attr="disabled" type="submit" @click="showForwardModal = false; document.querySelectorAll('[modal-backdrop]').forEach(el => el.remove());document.body.classList.remove('overflow-hidden');" data-modal-hide="forward-modal" class="ml-4 text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                                        Send
-                                    </button>
+                            <!-- Scrollable list -->
+                            <div class="flex-1 overflow-y-auto">
+                                <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    @foreach($contactList as $c)
+                                        <li class="py-1">
+                                            <label class="flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white cursor-pointer">
+                                                
+                                                <!-- Checkbox -->
+                                                <input type="checkbox" 
+                                                    value="{{ $c['acquaintance_id'].'|'.$c['name'] }}" 
+                                                    wire:model.live="selectedContacts" 
+                                                    class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" />
+                                                
+                                                <!-- Avatar -->
+                                                <div class="flex-shrink-0 ms-3">
+                                                    <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $c['avatar_color'] }}">
+                                                        <span class="text-xs font-medium text-white">
+                                                            {{ $c['avatar_initials'] }} 
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Name + About -->
+                                                <div class="flex-1 min-w-0 ms-4">
+                                                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                        {{$c['name']}}
+                                                    </p>
+                                                    <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                                                        {{$c['about']}}
+                                                    </p>
+                                                </div>
+                                            </label>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+
+                        @if(count($selectedContacts)>0)
+                            <!-- Modal footer -->
+                            <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                                <div class="flex flex-wrap gap-2 flex-1 text-sm">
+                                    @foreach($selectedContacts as $item)
+                                        <span class="px-2 py-1 bg-gray-600 text-white rounded text-sm">
+                                            {{ explode('|', $item)[1] ?? '' }}
+                                        </span>
+                                    @endforeach
                                 </div>
-                            @endif
-                        </form>
-                    </div>
+                                <button wire:loading.attr="disabled" type="submit" @click="showForwardModal = false; document.querySelectorAll('[modal-backdrop]').forEach(el => el.remove());document.body.classList.remove('overflow-hidden');" data-modal-hide="forward-modal" class="ml-4 text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                                    Send
+                                </button>
+                            </div>
+                        @endif
+                    </form>
                 </div>
             </div>
+        </div>
     
     @else
 
@@ -668,7 +720,7 @@
                 </svg>
                 <span class="sr-only">Error icon</span>
             </div>
-            <div class="ms-3 text-sm font-normal">You are now offline. Please check your internet connection.</div>
+            <div class="ms-3 text-sm font-normal">You are now offline. <br> Please check your internet connection.</div>
             <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-danger" aria-label="Close">
                 <span class="sr-only">Close</span>
                 <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -705,6 +757,9 @@
    
        
         Echo.join(roomName)
+        // .listen('MessageSent', (e) => {
+        //     console.log(e.message);
+        // })
         .here((users) => {
             const isOnline = users.some(u => u.id === event.userId2);
             console.log('ONLINE', isOnline, users);
@@ -834,7 +889,7 @@
         setTimeout(function() {
             setTimeout(() => {
                 document.getElementById('message').focus()
-            }, 100)
+            }, 200)
             document.getElementById("message_last").scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });          
             initDropdowns();
             initFlowbite();

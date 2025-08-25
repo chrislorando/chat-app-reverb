@@ -1,0 +1,58 @@
+FROM php:8.2-fpm
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    unzip \
+    curl \
+    git \
+    libzip-dev \
+    libonig-dev \
+    libxml2-dev \
+    libsqlite3-dev \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js (alternative method)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite zip
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set working directory
+WORKDIR /var/www
+
+# Copy composer files first (for Docker layer caching)
+COPY composer.json composer.lock ./
+
+# Copy npm files first
+COPY package*.json ./
+
+# Install Node dependencies
+RUN npm install
+
+# Copy application files
+COPY . .
+
+# Install PHP dependencies
+RUN composer install --optimize-autoloader --no-interaction
+
+# Build frontend assets
+RUN npm run build
+
+RUN mkdir -p storage/framework/{cache,sessions,testing,views} \
+    && mkdir -p database/ \
+    && touch database/database.sqlite \
+    && chown -R www-data:www-data storage bootstrap/cache database \
+    && chmod -R 775 storage bootstrap/cache database \
+    && chmod 664 database/database.sqlite
+
+# Copy supervisord config
+COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+EXPOSE 9000 8083
+CMD ["php-fpm","/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
