@@ -40,39 +40,48 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh '''
-                    docker compose up -d
-                    
-                    # Wait container ready
-                    sleep 10
-                    
-                    # Run migration and setup Laravel
-                    docker compose exec -T app cp .env.example .env
-                    docker compose exec -T app php artisan key:generate
+                withCredentials([
+                string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+                string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
+                string(credentialsId: 'REVERB_APP_ID', variable: 'REVERB_APP_ID'),
+                string(credentialsId: 'REVERB_APP_KEY', variable: 'REVERB_APP_KEY'),
+                string(credentialsId: 'REVERB_APP_SECRET', variable: 'REVERB_APP_SECRET')
+                ]) 
+                    {
+                    sh '''
+                        docker compose up -d
+                        
+                        # Wait container ready
+                        sleep 10
+                        
+                        # Run migration and setup Laravel
+                        docker compose exec -T app cp .env.example .env
+                        docker compose exec -T app php artisan key:generate
 
-                    # Inject secrets
-                    docker compose exec -T app sh -c 'sed -i "s|^AWS_ACCESS_KEY_ID=.*|AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}|" .env'
-                    docker compose exec -T app sh -c 'sed -i "s|^AWS_SECRET_ACCESS_KEY=.*|AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}|" .env'
-                    docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_ID=.*|REVERB_APP_ID=${REVERB_APP_ID}|" .env'
-                    docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_KEY=.*|REVERB_APP_KEY=${REVERB_APP_KEY}|" .env'
-                    docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_SECRET=.*|REVERB_APP_SECRET=${REVERB_APP_SECRET}|" .env'
+                        # Inject secrets
+                        docker compose exec -T app sh -c 'sed -i "s|^AWS_ACCESS_KEY_ID=.*|AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}|" .env'
+                        docker compose exec -T app sh -c 'sed -i "s|^AWS_SECRET_ACCESS_KEY=.*|AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}|" .env'
+                        docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_ID=.*|REVERB_APP_ID=${REVERB_APP_ID}|" .env'
+                        docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_KEY=.*|REVERB_APP_KEY=${REVERB_APP_KEY}|" .env'
+                        docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_SECRET=.*|REVERB_APP_SECRET=${REVERB_APP_SECRET}|" .env'
 
-                    docker compose exec -T app php artisan webpush:vapid
-                    
-                    docker compose exec -T app php artisan migrate --force
-                    
-                    docker compose exec -T app php artisan cache:clear
-                    docker compose exec -T app php artisan route:clear
-                    docker compose exec -T app php artisan config:clear
-                    docker compose exec -T app php artisan view:clear
+                        docker compose exec -T app php artisan webpush:vapid
+                        
+                        docker compose exec -T app php artisan migrate --force
+                        
+                        docker compose exec -T app php artisan cache:clear
+                        docker compose exec -T app php artisan route:clear
+                        docker compose exec -T app php artisan config:clear
+                        docker compose exec -T app php artisan view:clear
 
-                    docker compose exec -T app php artisan config:cache
-                    docker compose exec -T app php artisan route:cache
-                    docker compose exec -T app php artisan optimize
+                        docker compose exec -T app php artisan config:cache
+                        docker compose exec -T app php artisan route:cache
+                        docker compose exec -T app php artisan optimize
 
-                    docker compose exec -T app php artisan reverb:start --debug &
+                        docker compose exec -T app php artisan reverb:start --debug &
 
-                '''
+                    '''
+                }
             }
         }
     }
