@@ -48,7 +48,7 @@ pipeline {
                 string(credentialsId: 'REVERB_APP_SECRET', variable: 'REVERB_APP_SECRET')
                 ]) 
                     {
-                    sh '''
+                    sh """
                         docker compose up -d
                         
                         # Wait container ready
@@ -59,6 +59,8 @@ pipeline {
                         docker compose exec -T app php artisan key:generate
 
                         # Inject secrets
+                        echo "AWS_ACCESS_KEY_ID=\$AWS_ACCESS_KEY_ID"
+                        echo "REVERB_APP_ID=\$REVERB_APP_ID"
                         docker compose exec -T app sh -c 'sed -i "s|^AWS_ACCESS_KEY_ID=.*|AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}|" .env'
                         docker compose exec -T app sh -c 'sed -i "s|^AWS_SECRET_ACCESS_KEY=.*|AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}|" .env'
                         docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_ID=.*|REVERB_APP_ID=${REVERB_APP_ID}|" .env'
@@ -80,7 +82,7 @@ pipeline {
 
                         docker compose exec -T app php artisan reverb:start --debug &
 
-                    '''
+                    """
                 }
             }
         }
