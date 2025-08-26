@@ -225,7 +225,7 @@ forwardMsgId: null
                                 </li>
                                 
                             </ul>
-                            <div class="ms-3 py-2 {{ $row->sender_id==auth()->id() ? 'block' : 'hidden'}}">
+                            <div class="py-2 {{ $row->sender_id==auth()->id() ? 'block' : 'hidden'}}">
                                 <button 
                                     type="button" 
                                     data-modal-target="delete-modal" 
@@ -233,7 +233,7 @@ forwardMsgId: null
                                     {{-- wire:click='remove({{ $row->id }})'  --}}
                                     @click="confirmDeleteId = {{ $row->id }}; showDeleteModal = true"
                                     class="{{ $row->sender_id==auth()->id() ? 'block' : 'hidden' }} flex items-center gap-2 w-full text-left px-1 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-white">
-                                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 ms-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
                                     </svg>
 
@@ -518,6 +518,7 @@ forwardMsgId: null
               
         </footer>
 
+        @if($models->count() > 0)
         <div x-show="showDeleteModal"
             @keydown.escape.window="showDeleteModal = false"
             x-transition 
@@ -543,6 +544,7 @@ forwardMsgId: null
                 </div>
             </div>
         </div>
+        
 
         <!-- Forward modal -->
         <div x-show="showForwardModal"
@@ -639,6 +641,7 @@ forwardMsgId: null
                 </div>
             </div>
         </div>
+        @endif
     
     @else
 
