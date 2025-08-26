@@ -13,17 +13,18 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    # supervisor \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js (alternative method)
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+# Install Node.js yang lebih aman (official method)
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite zip pcntl bcmath gmp gd mbstring xml fileinfo
+RUN docker-php-ext-install -j$(nproc) pdo pdo_mysql pdo_sqlite zip pcntl bcmath gmp gd
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
