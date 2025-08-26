@@ -56,8 +56,8 @@ pipeline {
                     docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_ID=.*|REVERB_APP_ID=${REVERB_APP_ID}|" .env'
                     docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_KEY=.*|REVERB_APP_KEY=${REVERB_APP_KEY}|" .env'
                     docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_SECRET=.*|REVERB_APP_SECRET=${REVERB_APP_SECRET}|" .env'
-                    
-                    php artisan webpush:vapid
+
+                    docker compose exec -T app php artisan webpush:vapid
                     
                     docker compose exec -T app php artisan migrate --force
                     
