@@ -24,7 +24,7 @@ services:
     container_name: chat-reverb-nginx-${COMPOSE_PROJECT_NAME}
     ports:
       - "8082:80"
-      - "8083:8083"
+      - "6000:6000"
     volumes:
       - chat-reverb-public:/var/www/public
       - chat-reverb-conf:/etc/nginx/conf.d
