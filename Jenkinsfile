@@ -51,17 +51,12 @@ pipeline {
                     docker compose exec -T app php artisan key:generate
 
                     # Inject secrets
-                    docker compose exec -T app sh -c '
-                    cat <<EOF > .env
-                    AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-                    AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-                    REVERB_APP_ID=${REVERB_APP_ID}
-                    REVERB_APP_KEY=${REVERB_APP_KEY}
-                    REVERB_APP_SECRET=${REVERB_APP_SECRET}
-                    EOF
+                    docker compose exec -T app sh -c 'sed -i "s|^AWS_ACCESS_KEY_ID=.*|AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}|" .env'
+                    docker compose exec -T app sh -c 'sed -i "s|^AWS_SECRET_ACCESS_KEY=.*|AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}|" .env'
+                    docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_ID=.*|REVERB_APP_ID=${REVERB_APP_ID}|" .env'
+                    docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_KEY=.*|REVERB_APP_KEY=${REVERB_APP_KEY}|" .env'
+                    docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_SECRET=.*|REVERB_APP_SECRET=${REVERB_APP_SECRET}|" .env'
                     '
-                    docker compose exec -T app php artisan key:generate
-
                     php artisan webpush:vapid
                     
                     docker compose exec -T app php artisan migrate --force
