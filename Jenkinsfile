@@ -70,7 +70,7 @@ pipeline {
                     docker compose exec -T app php artisan route:cache
                     docker compose exec -T app php artisan optimize
 
-                    php artisan reverb:start --debug &
+                    docker compose exec -T app php artisan reverb:start --debug &
 
                 '''
             }
