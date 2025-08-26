@@ -244,7 +244,7 @@ forwardMsgId: null
                     </div>
                 @endforeach
 
-                <template x-if="messages[currentChannel] && messages[currentChannel].length > 0">
+                {{-- <template x-if="messages[currentChannel] && messages[currentChannel].length > 0">
                     <template x-for="m in messages[currentChannel]" :key="m?.id">
                         <div :id="'message-' + m?.id" class="flex justify-end flex-none gap-2.5 w-full">
                             <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-2 rounded-s-xl rounded-br-xl border-green-200 bg-green-100 dark:bg-green-700">
@@ -282,7 +282,7 @@ forwardMsgId: null
                             </div>
                         </div>
                     </template>
-                </template>
+                </template> --}}
 
             </div>
 

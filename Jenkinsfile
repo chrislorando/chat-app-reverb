@@ -51,11 +51,16 @@ pipeline {
                     docker compose exec -T app php artisan key:generate
 
                     # Inject secrets
-                    sed -i "s|^AWS_ACCESS_KEY_ID=.*|AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}|" .env
-                    sed -i "s|^AWS_SECRET_ACCESS_KEY=.*|AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}|" .env
-                    sed -i "s|^REVERB_APP_ID=.*|REVERB_APP_ID=${REVERB_APP_ID}|" .env
-                    sed -i "s|^REVERB_APP_KEY=.*|REVERB_APP_KEY=${REVERB_APP_KEY}|" .env
-                    sed -i "s|^REVERB_APP_SECRET=.*|REVERB_APP_SECRET=${REVERB_APP_SECRET}|" .env
+                    docker compose exec -T app sh -c '
+                    cat <<EOF > .env
+                    AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+                    AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+                    REVERB_APP_ID=${REVERB_APP_ID}
+                    REVERB_APP_KEY=${REVERB_APP_KEY}
+                    REVERB_APP_SECRET=${REVERB_APP_SECRET}
+                    EOF
+                    '
+                    docker compose exec -T app php artisan key:generate
 
                     php artisan webpush:vapid
                     
@@ -69,6 +74,8 @@ pipeline {
                     docker compose exec -T app php artisan config:cache
                     docker compose exec -T app php artisan route:cache
                     docker compose exec -T app php artisan optimize
+
+                    php artisan reverb:start --debug &
 
                 '''
             }
