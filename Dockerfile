@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libsqlite3-dev \
+    libgmp-dev \
+    libpng-dev \
     # supervisor \
     && rm -rf /var/lib/apt/lists/*
 
@@ -18,7 +20,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite zip pcntl bcmath gmp
+RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite zip pcntl bcmath gmp gd mbstring tokenizer xml openssl fileinfo ctype json
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
