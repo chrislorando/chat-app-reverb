@@ -48,11 +48,16 @@
     </body>
 
 <script>
- setTimeout(function() {
-    initFlowbite() 
-}, 1000);
-
-window.VAPID_PUBLIC_KEY = "{{ config('webpush.vapid.public_key') }}";;
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if Flowbite is available
+    if (typeof initFlowbite === 'function') {
+        initFlowbite();
+    } else {
+        console.error('Flowbite not loaded');
+    }
+    
+    window.VAPID_PUBLIC_KEY = "{{ config('webpush.vapid.public_key') }}";
+});
 </script>
 
 </html>
