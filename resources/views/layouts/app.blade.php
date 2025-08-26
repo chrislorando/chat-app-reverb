@@ -50,9 +50,9 @@
 <script>
  setTimeout(function() {
     initFlowbite() 
-}, 500);
+}, 1000);
 
-window.VAPID_PUBLIC_KEY = "{{ env('VAPID_PUBLIC_KEY') }}";
+window.VAPID_PUBLIC_KEY = "{{ config('webpush.vapid.public_key') }}";;
 </script>
 
 </html>
