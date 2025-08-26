@@ -80,6 +80,8 @@ pipeline {
                         docker compose exec -T app php artisan route:cache
                         docker compose exec -T app php artisan optimize
 
+                        docker compose exec -T app npm run build
+
                         docker compose exec -T app php artisan reverb:start --debug &
 
                     """
