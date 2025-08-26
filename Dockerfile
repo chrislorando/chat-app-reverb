@@ -11,7 +11,10 @@ RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
     libgmp-dev \
     libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     # supervisor \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js (alternative method)
