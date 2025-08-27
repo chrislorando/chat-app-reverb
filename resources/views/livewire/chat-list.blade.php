@@ -78,9 +78,9 @@
                 @php($i=0)
                 @foreach($models as $row)
                 @php($i++)
-                    <li wire:key='{{ $row->id }}' class="flex items-center justify-between  group text-gray-900  dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group py-3 sm:py-4 {{ $isActiveChat==$row->id ? 'bg-slate-700' : '' }} px-3 cursor-pointer">
+                    <li wire:key='{{ $row->id }}' class="flex items-start justify-between  group text-gray-900  dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group py-3 sm:py-4 {{ $isActiveChat==$row->id ? 'bg-slate-700' : '' }} px-3 cursor-pointer">
                         <a 
-                        class="flex items-center w-full" 
+                        class="flex items-center flex-1" 
                         data-drawer-target="drawer-navigation"
                         data-drawer-hide="drawer-navigation"
                         data-drawer-backdrop="false"
@@ -98,10 +98,13 @@
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0 ms-4">
+                                @php($content = $row->latest_message?->content)
+
                                 <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
                                     {{ $row->alias_name ?? $row->email ?? $row->name }} 
                                 </p>
-                                <p class="text-sm text-gray-500 truncate dark:text-gray-400 flex">
+
+                                <p class="text-sm text-gray-500 truncate dark:text-gray-400 flex" title="{{$content == '' ? $row->latest_message?->message_type : $content}}">
                                     @if($row->latest_message?->file_url)
                                         @if($row->latest_message?->message_type == 'Document')
                                             <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -129,19 +132,8 @@
                                         ? \Illuminate\Support\Str::limit($row->latest_message->content, 35) 
                                         : $row->latest_message->file_name ?? $row->email }} --}}
 
-                                    @php($content = $row->latest_message?->content)
-
                                     @if ($content)
-                                        @if (preg_match('/https?:\/\/[^\s]+/', $content))
-                                            {!! preg_replace_callback(
-                                                '/(https?:\/\/[^\s]+)/',
-                                                fn($match) => '<svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.213 9.787a3.391 3.391 0 0 0-4.795 0l-3.425 3.426a3.39 3.39 0 0 0 4.795 4.794l.321-.304m-.321-4.49a3.39 3.39 0 0 0 4.795 0l3.424-3.426a3.39 3.39 0 0 0-4.794-4.795l-1.028.961"/></svg>',
-                                                nl2br(e($row->latest_message?->content))
-                                            ) !!}
-                                            {{ \Illuminate\Support\Str::limit($content, 35) }}
-                                        @else
-                                            {{ \Illuminate\Support\Str::limit($content, 35) }}
-                                        @endif
+                                        {{ \Illuminate\Support\Str::limit($content, 35) }}
                                     @else
                                         {{ $row->latest_message?->file_name ?? $row->email }}
                                     @endif
@@ -156,23 +148,33 @@
                             </div>
                         </a>
 
-                        @if($row->contact?->is_pinned)
-                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8 5v4.997a.31.31 0 0 1-.068.113c-.08.098-.213.207-.378.301-.947.543-1.713 1.54-2.191 2.488A6.237 6.237 0 0 0 4.82 14.4c-.1.48-.138 1.031.018 1.539C5.12 16.846 6.02 17 6.414 17H11v3a1 1 0 1 0 2 0v-3h4.586c.395 0 1.295-.154 1.575-1.061.156-.508.118-1.059.017-1.539a6.241 6.241 0 0 0-.541-1.5c-.479-.95-1.244-1.946-2.191-2.489a1.393 1.393 0 0 1-.378-.301.309.309 0 0 1-.068-.113V5h1a1 1 0 1 0 0-2H7a1 1 0 1 0 0 2h1Z"/>
-                            </svg>
-                        @endif
+                        <div class="flex flex-col items-end justify-between">
+                            <span class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                @if($row->latest_message?->created_at?->isToday())
+                                    {{ $row->latest_message?->created_at->format('H:i') }}
+                                @else
+                                    {{ $row->latest_message?->created_at->format('M j, Y') }}
+                                @endif
+                            </span>
 
-                        <div class="flex items-center group" x-transition >
-                            <button x-transition 
-                                id="dropdown-chat-list-button-{{ $row->id }}" 
-                                data-dropdown-toggle="dropdown-chat-list-{{ $row->id }}" 
-                                class="hidden group-hover:inline-flex items-center justify-center ms-3 text-sm font-medium text-gray-800 dark:text-gray-300"
-                            >
-                                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M12 6h.01M12 12h.01M12 18h.01"/>
-                                </svg>
-                            </button>
+                            <div class="flex items-center space-x-2">
+                                @if($row->contact?->is_pinned)
+                                    <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v4.997a.31.31 0 0 1-.068.113c-.08.098-.213.207-.378.301-.947.543-1.713 1.54-2.191 2.488A6.237 6.237 0 0 0 4.82 14.4c-.1.48-.138 1.031.018 1.539C5.12 16.846 6.02 17 6.414 17H11v3a1 1 0 1 0 2 0v-3h4.586c.395 0 1.295-.154 1.575-1.061.156-.508.118-1.059.017-1.539a6.241 6.241 0 0 0-.541-1.5c-.479-.95-1.244-1.946-2.191-2.489a1.393 1.393 0 0 1-.378-.301.309.309 0 0 1-.068-.113V5h1a1 1 0 1 0 0-2H7a1 1 0 1 0 0 2h1Z"/>
+                                    </svg>
+                                @endif
+
+                                <button id="dropdown-chat-list-button-{{ $row->id }}" 
+                                    data-dropdown-toggle="dropdown-chat-list-{{ $row->id }}" 
+                                    class="md:hidden bold group-hover:inline-flex items-center justify-center text-sm font-bold text-gray-800 dark:text-gray-300"
+                                >
+                                    <svg class="w-5 h-5 text-gray-800 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M12 6h.01M12 12h.01M12 18h.01"/>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
+
 
                         <div id="dropdown-chat-list-{{$row->id}}" data-dropdown-placement="right" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-44 border-2 border-gray-600 dark:bg-gray-700">
                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">

@@ -300,11 +300,11 @@
                                     </div>
                                     <p class="break-all text-sm font-normal py-2 text-gray-900 dark:text-white">
                                         {{-- {{ $row->content }} --}}
-                                        {!! preg_replace_callback(
+                                        {!! nl2br(preg_replace_callback(
                                             '/(https?:\/\/[^\s]+)/',
-                                            fn($match) => '<a href="' . e($match[0]) . '" target="_blank" class="text-blue-500 underline" target="_blank" rel="noopener noreferrer">' . e($match[0]) . '</a>',
-                                            nl2br(e($row->content))
-                                        ) !!}
+                                            fn($match) => '<a href="' . e($match[0]) . '" target="_blank" class="text-green-400 underline" rel="noopener noreferrer">' . e($match[0]) . '</a>',
+                                            e($row->content)
+                                        )) !!}
                                     </p>                            
                                 </div>
                             </div>
