@@ -23,7 +23,8 @@ self.addEventListener('push', function(event) {
                 body: data.body || '',
                 icon: data.icon || '',   
                 badge: data.badge || '',
-                actions: data.actions || []
+                actions: data.actions || [],
+                data: data.data || []
             })
             .then(() => console.log('Notification shown'))
             .catch(e => console.error('Notification error:', e))
@@ -37,9 +38,17 @@ self.addEventListener('push', function(event) {
 
 self.addEventListener('notificationclick', function(event) {
     event.notification.close();
+    console.log(event.notification)
 
-    // buka tab aplikasi kalau user klik notifikasi
-    event.waitUntil(
-        clients.openWindow('/')
-    );
+    const uid = event.notification.data.uid;
+
+    if (event.action === 'notification_action') {
+        event.waitUntil(
+            clients.openWindow(`/chat/${uid}`)
+        );
+    } else {
+        event.waitUntil(
+            clients.openWindow('/')
+        );
+    }
 });

@@ -33,13 +33,22 @@ Route::post('/push/subscribe', function (Request $request) {
 
 Route::get('/push', function (Request $request) {
     $receiver = User::find(1);
-    $receiver->notify(new PushMessageBrowser('https://avatar.iran.liara.run/public/24', 'Test Notification', 'This is a test notification from the browser!'));
+    $receiver->notify(new PushMessageBrowser($receiver->id, 'https://avatar.iran.liara.run/public/24', 'Test Notification', 'This is a test notification from the browser!'));
     // Notification::send(User::all(),new PushMessageBrowser());
     return redirect()->back();
 })
 ->middleware(['auth'])
 ->name('push');
 // Broadcast::routes();
+
+
+Route::get('/chat/{uid}', function (Request $request, $uid) {
+    session()->flash('openChatUid', $uid);
+    return redirect()->route('dashboard');
+
+})
+->middleware(['auth'])
+->name('push');
 
 // Broadcast::routes(['middleware' => ['auth']]); 
 // Broadcast::routes(['middleware' => ['auth:api']]);

@@ -86,7 +86,7 @@ A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind C
    php artisan reverb:start
 
 ## Demo Link
-   Coming soon
+   https://chatsapp.demolite.my.id
 
 ## Credits
-https://avatar-placeholder.iran.liara.run/avatars
+   https://avatar-placeholder.iran.liara.run/avatars

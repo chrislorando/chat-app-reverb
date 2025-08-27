@@ -13,13 +13,14 @@ class PushMessageBrowser extends Notification
 {
     use Queueable;
 
-    public $icon, $title, $body;
+    public $uid, $icon, $title, $body;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($icon, $title, $body)
+    public function __construct($uid, $icon, $title, $body)
     {
+        $this->uid = $uid;
         $this->icon = $icon;
         $this->title = $title;
         $this->body = $body;
@@ -43,7 +44,7 @@ class PushMessageBrowser extends Notification
             ->icon($this->icon)
             ->badge($this->icon)
             ->action('View App', 'notification_action')
-            // ->data(['id' => $notification->id])
+            ->data(['uid' => $this->uid])
             ->options(['TTL' => 3600]);
             // ->title('Approved!')
             

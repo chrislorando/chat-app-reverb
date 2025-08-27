@@ -169,7 +169,7 @@ class ChatMessage extends Component
 
         $receiver = User::find($this->uid);
         $aliasOfMe = $receiver->contactAlias(auth()->id())->first()?->alias_name ?? auth()->user()->name;
-        $receiver->notify(new PushMessageBrowser(auth()->user()->avatar_image, $aliasOfMe, $this->message));
+        $receiver->notify(new PushMessageBrowser(auth()->id(), auth()->user()->avatar_image, $aliasOfMe, $this->message));
 
         // $this->closeUploadDrawer();
         $this->reset([
@@ -437,7 +437,7 @@ class ChatMessage extends Component
 
             $receiver = User::find($receiverId);
             $aliasOfMe = $receiver->contactAlias(auth()->id())->first()?->alias_name ?? auth()->user()->name;
-            $receiver->notify(new PushMessageBrowser(auth()->user()->avatar_image, $aliasOfMe, $this->targetMessageText));
+            $receiver->notify(new PushMessageBrowser(auth()->id(), auth()->user()->avatar_image, $aliasOfMe, $this->targetMessageText));
         }
 
         Message::insert($data);

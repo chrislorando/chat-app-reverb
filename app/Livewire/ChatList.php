@@ -20,6 +20,16 @@ class ChatList extends Component
     public $uid;
     public $isAddContactOpen = false;
     public $filter;
+
+    protected $listeners = ['chat'];
+
+    public function mount()
+    {
+        if (session()->has('openChatUid')) {
+            $uid = session('openChatUid');
+            $this->dispatch('chat', uid:$uid);
+        }
+    }
     
 
     public function loadMore()
@@ -36,11 +46,12 @@ class ChatList extends Component
         $userId1 = min(auth()->id(), $this->uid);
         $userId2 = max(auth()->id(), $this->uid);
 
-
         $this->dispatch('open-chat', uid:$uid, userId1:$userId1, userId2:$userId2, action:'init')->to(ChatMessage::class);
         $this->dispatch('toggle-profile')->to(ChatHeader::class);
         $this->dispatch('toggle-media')->to(ChatHeader::class);
         $this->isActiveChat = $uid;
+
+        session()->forget('openChatUid');
     }
 
     public function logout(Logout $logout): void

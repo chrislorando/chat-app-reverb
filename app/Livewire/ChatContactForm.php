@@ -88,11 +88,8 @@ class ChatContactForm extends Component
 
         session()->flash('success', 'Contact saved.');
 
-        $userId1 = min(auth()->id(), $contact->acquaintance_id);
-        $userId2 = max(auth()->id(), $contact->acquaintance_id);
-
-        $this->dispatch('open-chat', uid:$contact->acquaintance_id, userId1:$userId1, userId2:$userId2, action:'init')->to(ChatMessage::class);
-        $this->dispatch('refresh-list')->to(ChatList::class);
+        $this->dispatch('chat', uid:$contact->acquaintance_id)->to(ChatList::class);
+    
     }
 
     public function destroy($contactId)
