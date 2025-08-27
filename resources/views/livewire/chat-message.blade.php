@@ -361,7 +361,7 @@ forwardMsgId: null
                         
                         @if($photo)
                             <div class="mb-2 p-4 h-full md:h-96 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex items-center justify-center">
-                                <img class="h-full min-w-min md:max-w-xs " 
+                                <img class="h-72 w-auto max-w-full object-contain" 
                                     src="{{ $photo->temporaryUrl() }}"
                                     alt="Preview image">
                             </div>
