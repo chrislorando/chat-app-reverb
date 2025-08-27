@@ -23,7 +23,7 @@ forwardMsgId: null
 
                     <div id="message{{ $row->id }}" wire:key='{{ $row->id }}' class="flex justify-end {{ $row->sender_id==auth()->id() ? '' : 'flex-row-reverse' }} flex-none gap-1 w-full">
                         {{-- <img class="w-8 h-8 rounded-full" src="https://avatars.githubusercontent.com/u/167683279?v=4" alt="Jese image"> --}}
-                        <div class="flex flex-col w-auto max-w-lg leading-1.5 p-2  {{ $row->sender_id==auth()->id() ? 'rounded-s-xl rounded-br-xl border-green-200 bg-green-100 dark:bg-green-700' : 'rounded-e-xl rounded-es-xl border-gray-200 bg-gray-100 dark:bg-gray-700' }}">
+                        <div class="flex flex-col w-max md:w-auto max-w-lg leading-1.5 p-2  {{ $row->sender_id==auth()->id() ? 'rounded-s-xl rounded-br-xl border-green-200 bg-green-100 dark:bg-green-700' : 'rounded-e-xl rounded-es-xl border-gray-200 bg-gray-100 dark:bg-gray-700' }}">
                             <div class="flex items-center space-x-2 rtl:space-x-reverse">
                                 {{-- <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ optional($row->sender)->name }}</span> --}}
                                 @if($row->interaction_type == 'Forward')
