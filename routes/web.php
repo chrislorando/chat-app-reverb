@@ -47,8 +47,7 @@ Route::get('/chat/{uid}', function (Request $request, $uid) {
     return redirect()->route('dashboard');
 
 })
-->middleware(['auth'])
-->name('push');
+->middleware(['auth']);
 
 // Broadcast::routes(['middleware' => ['auth']]); 
 // Broadcast::routes(['middleware' => ['auth:api']]);
