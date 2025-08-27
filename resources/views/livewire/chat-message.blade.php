@@ -98,7 +98,7 @@ forwardMsgId: null
                                     </a> --}}
                                     <div class="flex justify-between items-start my-1 bg-gray-50 {{ $row->sender_id==auth()->id() ? 'dark:bg-green-800' : 'dark:bg-gray-600' }} rounded-xl p-2 w-full">
                                         <div class="me-2">
-                                            <span class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white pb-2">
+                                            <span class="break-all flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white pb-2">
                                                 @php
                                                     $ext = strtolower(pathinfo($row->file_name, PATHINFO_EXTENSION));
                                                 @endphp
@@ -899,6 +899,24 @@ forwardMsgId: null
             initFlowbite();
         }, 1000);
     });
+
+    Livewire.hook('commit', ({ component, commit, respond, succeed, fail }) => {
+        // Runs immediately before a commit's payload is sent to the server...
+    
+        respond(() => {
+            // Runs after a response is received but before it's processed...
+        })
+    
+        succeed(({ snapshot, effect }) => {
+            console.log('COMMIT', component, commit, snapshot, effect);
+            initDropdowns();
+            initFlowbite();
+        })
+    
+        fail(() => {
+            // Runs if some part of the request failed...
+        })
+    })
 
    
 </script>

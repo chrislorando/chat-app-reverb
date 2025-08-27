@@ -110,11 +110,10 @@
         </button>
         <div class="grid grid-cols-4 gap-4">
             @foreach($thumbnails as $m)
-            <div>
-                <img class="h-full w-full object-cover rounded-lg" src="{{$m->file_url}}" alt="">
-            </div>
+                <div class="h-20 flex items-center justify-center bg-gray-500/20 rounded-lg overflow-hidden">
+                    <img class="max-h-full max-w-full object-contain" src="{{ $m->file_url }}" alt="">
+                </div>
             @endforeach
-          
         </div>
 
         <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
@@ -175,12 +174,21 @@
                 @if($media)
                     @foreach ($media as $monthYear => $images)
                         <p class="text-sm text-gray-900 dark:text-white uppercase mb-2">{{ $monthYear }}</p>
-                        <div class="grid grid-cols-4 gap-4">
+                        {{-- <div class="grid grid-cols-4 gap-4">
                             @foreach ($images as $image)
                                 <img class="h-full w-full object-cover rounded-lg" src="{{$image->file_url}}" alt="">
                             @endforeach
+                        </div> --}}
+
+                        <div class="grid grid-cols-4 gap-4">
+                            @foreach ($images as $image)
+                                <div class="h-20 flex items-center justify-center bg-gray-500/20 rounded-lg overflow-hidden">
+                                    <img class="max-h-full max-w-full object-contain" src="{{$image->file_url}}" alt="">
+                                </div>
+                            @endforeach
                         </div>
                     @endforeach
+                   
                 @endif
             </div>
             <div class="{{ $isTabDocsOpen ? '' : 'hidden' }} p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="docs" role="tabpanel" aria-labelledby="docs-tab">
@@ -190,7 +198,7 @@
                             <div class="flex flex-col gap-2.5">
                                 <div class="flex flex-col w-full max-w-[326px] leading-1.5 p-4  {{ $row->sender_id==auth()->id() ? 'rounded-s-xl rounded-br-xl border-green-200 bg-green-100 dark:bg-green-700' : 'rounded-e-xl rounded-es-xl border-gray-200 bg-gray-100 dark:bg-gray-700' }}">
                                     <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                                        <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                                        <span class="text-xs font-normal text-gray-500 dark:text-gray-300">
                                             @if (\Carbon\Carbon::parse($row->timestamp)->isToday())
                                                 {{ \Carbon\Carbon::parse($row->timestamp)->format('H:i') }}
                                             @else
@@ -215,7 +223,7 @@
                                             <img src="{{ $row->fileUrl() }}" class="rounded-lg" />
                                         </div>
                                     @elseif($row->message_type == 'Document')
-                                        <div class="flex justify-between items-start my-2.5 bg-gray-50 {{ $row->sender_id==auth()->id() ? 'dark:bg-green-800' : 'dark:bg-gray-600' }} rounded-xl p-2 w-full">
+                                        <div class="break-all flex justify-between items-start my-2.5 bg-gray-50 {{ $row->sender_id==auth()->id() ? 'dark:bg-green-800' : 'dark:bg-gray-600' }} rounded-xl p-2 w-full">
                                             <div class="me-2">
                                                 <span class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white pb-2">
                                                     @php

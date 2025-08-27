@@ -18,7 +18,7 @@
                             </svg>
                         </button>
 
-                        <button id="userMenuButton" data-dropdown-toggle="userMenu" data-dropdown-placement="bottom-start" class="inline-flex  rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
+                        <button id="userMenuButton" data-dropdown-toggle="userMenu" data-dropdown-placement="bottom-start" class="px-2 py-2 text-sm font-medium text-center inline-flex items-center text-white rounded-full hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
                             <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
                                 <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"></path>
                             </svg>
