@@ -390,7 +390,7 @@ forwardMsgId: null
                         
                             <input 
                                 key="upload-{{ now()->timestamp }}"
-                                wire:model='message' 
+                                wire:model.defer='message' 
                                 {{-- wire:keydown="typing"
                                 wire:keydown.debounce.1500ms="notTyping" --}}
                                 type="text" 
@@ -481,7 +481,7 @@ forwardMsgId: null
                             <input wire:model='targetMessageId' type="hidden" class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="false" />
                         
                             @if (!$photo || !$document) 
-                                <textarea wire:ignore required focus
+                                <textarea wire:ignore focus
                                     type="text" 
                                     id="message" 
                                     key="{{ now()->timestamp }}"
@@ -852,7 +852,7 @@ forwardMsgId: null
                 document.getElementById("message_last").scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });          
                 initDropdowns();
                 initFlowbite();
-            }, 500);
+            }, 1000);
          
         });
 
