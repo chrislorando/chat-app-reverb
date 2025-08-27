@@ -113,6 +113,17 @@ class ChatHeader extends Component
         $this->isTabMediaOpen = false;
         $this->isTabDocsOpen = false;
         $this->isTabLinksOpen = false;
+
+        $this->thumbnails = Message::whereIn('message_type', ['Image'])
+            ->where(function ($q) {
+                $q->where('sender_id', auth()->id())
+                ->where('receiver_id', $this->senderId)
+                ->orWhere('sender_id', $this->senderId)
+                ->where('receiver_id', auth()->id());
+            })
+            ->orderBy('id','desc')
+            ->limit(4)
+            ->get();
     }
 
     #[On('toggle-media')]
