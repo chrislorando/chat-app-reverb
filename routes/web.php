@@ -49,6 +49,28 @@ Route::get('/chat/{uid}', function (Request $request, $uid) {
 })
 ->middleware(['auth']);
 
+Route::get('/download', function(Request $request){
+    $fullUrl = $request->file; 
+
+    $parsedPath = parse_url($fullUrl, PHP_URL_PATH); 
+    $relativePath = ltrim($parsedPath, '/chat-reverb/');
+
+    $originalName = basename($relativePath); // abc.pdf
+    $extension = pathinfo($originalName, PATHINFO_EXTENSION);
+
+    $customName = 'ChatsApp_'. now()->format('YmdHis').'.' . $extension;
+
+    $stream = Storage::disk('s3')->readStream($relativePath);
+
+    return response()->stream(function() use ($stream) {
+        fpassthru($stream);
+    }, 200, [
+        'Content-Type' => Storage::disk('s3')->mimeType($relativePath),
+        'Content-Length' => Storage::disk('s3')->size($relativePath),
+        'Content-Disposition' => 'attachment; filename="'.$customName.'"',
+    ]);
+})->middleware(['auth']);
+
 // Broadcast::routes(['middleware' => ['auth']]); 
 // Broadcast::routes(['middleware' => ['auth:api']]);
 
