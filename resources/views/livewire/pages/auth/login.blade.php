@@ -4,10 +4,24 @@ use App\Livewire\Forms\LoginForm;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use App\Models\User;
 
 new #[Layout('layouts.guest')] class extends Component
 {
     public LoginForm $form;
+
+    public $users;
+
+    public function mount()
+    {
+        $this->users = User::limit(3)->get();
+    }
+
+    public function fillForm($email)
+    {
+        $this->form->email = $email;
+        $this->form->password = 'password';
+    }
 
     /**
      * Handle an incoming authentication request.
@@ -25,6 +39,32 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
+    <div class="w-full p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6 dark:bg-gray-800 dark:border-gray-700">
+        <h5 class="mb-3 text-base font-semibold text-gray-900 md:text-xl dark:text-white">
+            Login As
+        </h5>
+        <ul role="list">
+            @foreach($users as $c)
+                <li class="py-1 border-0">
+                    <label wire:click="fillForm('{{ $c->email }}')" class="flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white cursor-pointer">
+                        <!-- Avatar -->
+                        <x-avatar 
+                                :avatar="$c->avatar" 
+                                :avatar_color="$c->avatar_name['color']" 
+                                :avatar_initials="$c->avatar_name['initials']"  />
+                        
+                        <!-- Name + About -->
+                        <div class="flex-1 min-w-0 ms-4">
+                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                {{$c['name']}}
+                            </p>
+                        </div>
+                    </label>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -72,4 +112,5 @@ new #[Layout('layouts.guest')] class extends Component
             </x-primary-button>
         </div>
     </form>
+
 </div>
