@@ -9,7 +9,8 @@ services:
     volumes:
       - chat-reverb-public:/var/www/public
       - chat-reverb-conf:/var/www/docker/nginx/conf.d
-      - chat-reverb-db:/var/www/database
+      # - chat-reverb-db:/var/www/database
+      # - ./database/database.sqlite:/var/www/database/database.sqlite
     # environment:
     #   - APP_ENV=production
     #   - APP_DEBUG=false
@@ -38,7 +39,7 @@ services:
 volumes:
   chat-reverb-public:
   chat-reverb-conf:
-  chat-reverb-db:
+  # chat-reverb-db:
 
 networks:
   chat-reverb-network:
