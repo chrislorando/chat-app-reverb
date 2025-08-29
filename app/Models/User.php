@@ -22,6 +22,7 @@ class User extends Authenticatable
         'about',
         'email',
         'password',
+        'avatar'
     ];
 
     /**
@@ -38,7 +39,7 @@ class User extends Authenticatable
         'initials',
         'avatar_image',
         'avatar_color',
-        'avatar',
+        'avatar_name',
         'alias_name'
     ];
 
@@ -87,7 +88,7 @@ class User extends Authenticatable
         return $colors[$colorIndex];
     }
 
-    public function getAvatarAttribute(): array
+    public function getAvatarNameAttribute(): array
     {
         return [
             'initials' => $this->initials,

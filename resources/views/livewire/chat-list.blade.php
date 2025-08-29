@@ -91,11 +91,9 @@
                             <div class="flex-shrink-0">
                                 {{-- <img class="w-8 h-8 rounded-full" src="https://avatar.iran.liara.run/public/{{$row->id < 100 ? $row->id : 100 }}" alt="Neil image"> --}}
                                 {{-- <img class="w-8 h-8 rounded-full" src="https://avatar.iran.liara.run/public/1" alt=" {{ $row->name }}"> --}}
-                                <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $row->avatar['color'] }}">
-                                    <span class="text-xs font-medium text-white">
-                                        {{ $row->avatar['initials'] }} 
-                                    </span>
-                                </div>
+                               
+                                <x-avatar :avatar="$row->avatar" :avatar_initials="$row->avatarName['initials']" :avatar_color="$row->avatarName['color']" />
+
                             </div>
                             <div class="flex-1 min-w-0 ms-4">
                                 @php($content = $row->latest_message?->content)
@@ -217,7 +215,7 @@
 
     </aside>
 
-    <div id="drawer-contact" class="w-screen md:w-96 fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full w-80 dark:bg-gray-800 md:w-96 bg-white border-r border-gray-200 dark:border-gray-700 {{ $isAddContactOpen ? 'transform-none' : '' }}" tabindex="-1" aria-labelledby="drawer-contact-label">
+    <div id="drawer-contact" class="w-screen md:w-96 fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full dark:bg-gray-800 bg-white border-r border-gray-200 dark:border-gray-700 {{ $isAddContactOpen ? 'transform-none' : '' }}" tabindex="-1" aria-labelledby="drawer-contact-label">
         <h5 id="drawer-contact-label" class="inline-flex items-center mb-6 text-base font-semibold text-gray-500 uppercase dark:text-gray-400">
             <svg class="w-6 h-6 me-2.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>

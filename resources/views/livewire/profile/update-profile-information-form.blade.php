@@ -5,12 +5,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 
 new class extends Component
 {
+    use WithFileUploads;
+    
     public string $name = '';
     public string $email = '';
     public string $about = '';
+    public $avatar;
 
     /**
      * Mount the component.
@@ -20,6 +24,7 @@ new class extends Component
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
         $this->about = Auth::user()->about ?? '';
+        $this->avatar = Auth::user()->avatar ?? '';
     }
 
     /**
@@ -33,7 +38,14 @@ new class extends Component
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
             'about' => ['nullable', 'string', 'max:255'],
+            'avatar' => ['nullable', 'image', 'max:1024'],
         ]);
+        
+
+        if (!empty($this->avatar)) {
+            $path = $this->avatar->storePublicly('avatars');
+            $validated['avatar'] = Storage::url($path);
+        }
 
         $user->fill($validated);
 
@@ -77,6 +89,41 @@ new class extends Component
     </header>
 
     <form wire:submit="updateProfileInformation" class="mt-6 space-y-6">
+        <div
+            x-data="{ uploading: false, progress: 0 }"
+            x-on:livewire-upload-start="uploading = true"
+            x-on:livewire-upload-finish="uploading = false"
+            x-on:livewire-upload-cancel="uploading = false"
+            x-on:livewire-upload-error="uploading = false"
+            x-on:livewire-upload-progress="progress = $event.detail.progress"
+        >
+            {{-- Hidden file input --}}
+            <input wire:model="avatar" id="avatar" name="avatar" type="file" class="hidden" />
+
+            {{-- Avatar preview as button --}}
+            <label for="avatar" class="cursor-pointer inline-block">
+                @if ($avatar)
+                    <img src="{{ $avatar instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile 
+                                    ? $avatar->temporaryUrl() 
+                                    : asset($avatar) }}"
+                        class="w-24 h-24 rounded-full object-cover border border-gray-300 shadow-sm"
+                        alt="Avatar Preview">
+                @else
+                    <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center border border-gray-300 shadow-sm">
+                        <span class="text-gray-500">+</span>
+                    </div>
+                @endif
+            </label>
+
+            <div x-show="uploading" class="mt-2 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div class="bg-green-600 h-2 transition-all duration-200"
+                    :style="`width: ${progress}%;`">
+                </div>
+            </div>
+
+            <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
+        </div>
+
         <div>
             <x-input-label for="name" :value="__('Name')" />
             <x-text-input wire:model="name" id="name" name="name" type="text" class="mt-1 block w-full" required autofocus autocomplete="name" />

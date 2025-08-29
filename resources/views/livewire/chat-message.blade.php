@@ -891,33 +891,20 @@ forwardMsgId: null
         //     })
 
         setTimeout(function() {
-            setTimeout(() => {
-                document.getElementById('message').focus()
-            }, 200)
+            document.getElementById('message').focus();
             document.getElementById("message_last").scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });          
             initDropdowns();
             initFlowbite();
         }, 1000);
     });
 
-    Livewire.hook('commit', ({ component, commit, respond, succeed, fail }) => {
-        // Runs immediately before a commit's payload is sent to the server...
-    
-        respond(() => {
-            // Runs after a response is received but before it's processed...
-        })
-    
+    Livewire.hook('commit', ({ component, commit, respond, succeed, fail }) => {    
         succeed(({ snapshot, effect }) => {
-            console.log('COMMIT', component, commit, snapshot, effect);
+            // console.log('COMMIT', component, commit, snapshot, effect);
             initDropdowns();
             initFlowbite();
-        })
-    
-        fail(() => {
-            // Runs if some part of the request failed...
-        })
-    })
-
+        });
+    });
    
 </script>
 @endscript

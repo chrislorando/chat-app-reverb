@@ -42,11 +42,13 @@
                 <div class="flex-shrink-0">
                     <div class="relative">
                         {{-- <img class="w-10 h-10 rounded-full" src="https://avatars.githubusercontent.com/u/167683279?v=4" alt=""> --}}
-                        <div class="w-8 h-8 rounded-full {{ $userModel->avatar['color'] }}  flex items-center justify-center">
+                        {{-- <div class="w-8 h-8 rounded-full {{ $userModel->avatarName['color'] }}  flex items-center justify-center">
                             <span class="text-xs font-medium text-white">
-                                {{ $userModel->avatar['initials'] }}
+                                {{ $userModel->avatarName['initials'] }}
                             </span>
-                        </div>
+                        </div> --}}
+                        <x-avatar :avatar="$userModel->avatar" :avatar_initials="$userModel->avatarName['initials']" :avatar_color="$userModel->avatarName['color']" />
+
                         <span class="bottom-0 left-7 absolute  w-3.5 h-3.5 {{ $isOnline ? 'animate-pulse bg-green-400' : 'bg-red-400' }} border-2 border-white dark:border-gray-800 rounded-full"></span>
                         {{-- <livewire:chat-user-online :senderId="$senderId" :authId="$authId" :wire:key="'chat-online-'.$senderId.$authId" /> --}}
                     </div>
@@ -72,12 +74,18 @@
     </header>
 
     <div id="drawer-profile" class="fixed top-0 right-0 z-50 w-screen md:w-96 h-screen p-4 overflow-y-auto transition-transform translate-x-full bg-white dark:bg-gray-800 border-s border-slate-600 {{ $isProfileOpen ? 'transform-none' : '' }}" tabindex="-1" aria-labelledby="drawer-profile-label">
-        <button type="button" @click="$dispatch('toggle-contact-header', [{{ $userModel->id }}])" id="drawer-profile-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
-            <svg class="w-6 h-6 me-2.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.779 17.779 4.36 19.918 6.5 13.5m4.279 4.279 8.364-8.643a3.027 3.027 0 0 0-2.14-5.165 3.03 3.03 0 0 0-2.14.886L6.5 13.5m4.279 4.279L6.499 13.5m2.14 2.14 6.213-6.504M12.75 7.04 17 11.28"/>
-            </svg>
-            Contact info
-        </button>
+        @if($userModel->alias_name)
+            <button type="button" @click="$dispatch('toggle-contact-header', [{{ $userModel->id }}])" id="drawer-profile-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+                <svg class="w-6 h-6 me-2.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.779 17.779 4.36 19.918 6.5 13.5m4.279 4.279 8.364-8.643a3.027 3.027 0 0 0-2.14-5.165 3.03 3.03 0 0 0-2.14.886L6.5 13.5m4.279 4.279L6.499 13.5m2.14 2.14 6.213-6.504M12.75 7.04 17 11.28"/>
+                </svg>
+                Contact info
+            </button>
+        @else
+            <button type="button" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+                Contact info
+            </button>
+        @endif
         <button type="button" @click="$dispatch('toggle-profile')" data-drawer-hide="drawer-profile" aria-controls="drawer-profile" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
             <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
@@ -86,13 +94,24 @@
         </button>
         <div class="flex flex-col items-center pb-10">
             {{-- <img class="w-24 h-24 mb-3 rounded-full shadow-lg" src="/docs/images/people/profile-picture-3.jpg" alt="Bonnie image"/> --}}
-            <div class="w-24 h-24 mb-3 shadow-lg rounded-full {{ $userModel->avatar['color'] }}  flex items-center justify-center">
+            {{-- <div class="w-24 h-24 mb-3 shadow-lg rounded-full {{ $userModel->avatarName['color'] }}  flex items-center justify-center">
                 <span class="text-xl font-medium text-white">
-                    {{ $userModel->avatar['initials'] }}
+                    {{ $userModel->avatarName['initials'] }}
                 </span>
-            </div>
+            </div> --}}
+            <x-avatar :avatar="$userModel->avatar" :avatar_initials="$userModel->avatarName['initials']" :avatar_color="$userModel->avatarName['color']" size="md" />
+            
             <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">{{ $userModel->alias_name ?? $userModel->name }} </h5>
             <span class="text-sm text-gray-500 dark:text-gray-400">{{ $userModel->email }}</span>
+
+            @if(!$userModel->alias_name)
+                <button type="button" @click="$dispatch('toggle-contact-header', [{{ $userModel->id }}])" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-100 font-medium rounded-lg text-sm px-3 py-2 text-center inline-flex items-center dark:focus:ring-green-100 mt-4">
+                    <svg class="w-5 h-5 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
+                    </svg>
+                    Add
+                </button>
+            @endif
         </div>
 
         <h6 class="mb-1 text-sm text-gray-900 md:text-md dark:text-white">
@@ -325,10 +344,17 @@
 
     <div id="drawer-contact" class="fixed top-0 right-0 z-50 w-screen md:w-96 h-screen p-4 overflow-y-auto transition-transform translate-x-full bg-white dark:bg-gray-800 border-s border-slate-600 {{ $isAddContactHeaderOpen ? 'transform-none' : '' }}" tabindex="-1" aria-labelledby="drawer-contact-label">
         <h5 id="drawer-contact-label" class="inline-flex items-center mb-6 text-base font-semibold text-gray-500 uppercase dark:text-gray-400">
-            <svg class="w-6 h-6 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-            </svg>
-            Edit contact
+            @if(!$userModel->alias_name)
+                <svg class="w-6 h-6 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                </svg>
+                Add contact
+            @else
+                <svg class="w-6 h-6 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="square" stroke-linejoin="round" stroke-width="2" d="M7 19H5a1 1 0 0 1-1-1v-1a3 3 0 0 1 3-3h1m4-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm7.441 1.559a1.907 1.907 0 0 1 0 2.698l-6.069 6.069L10 19l.674-3.372 6.07-6.07a1.907 1.907 0 0 1 2.697 0Z"/>
+                </svg>
+                Edit contact
+            @endif
         </h5>
 
         <button type="button" @click="$dispatch('toggle-contact-header', null)" data-drawer-hide="drawer-contact" aria-controls="drawer-contact" class="mb-2 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
