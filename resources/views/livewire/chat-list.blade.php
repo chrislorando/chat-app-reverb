@@ -102,7 +102,7 @@
                                     {{ $row->alias_name ?? $row->email ?? $row->name }} 
                                 </p>
 
-                                <p class="text-sm text-gray-500 truncate dark:text-gray-400 flex" title="{{$content == '' ? $row->latest_message?->message_type : $content}}">
+                                <p class="break-all text-sm text-gray-500 truncate dark:text-gray-400 flex" title="{{$content == '' ? $row->latest_message?->message_type : $content}}">
                                     @if($row->latest_message?->file_url)
                                         @if($row->latest_message?->message_type == 'Document')
                                             <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -133,7 +133,7 @@
                                     @if ($content)
                                         {{ \Illuminate\Support\Str::limit($content, 35) }}
                                     @else
-                                        {{ $row->latest_message?->file_name ?? $row->email }}
+                                        {{ $row->latest_message?->file_name ? \Illuminate\Support\Str::limit($row->latest_message?->file_name, 30) : $row->email }}
                                     @endif
 
                                 </p>

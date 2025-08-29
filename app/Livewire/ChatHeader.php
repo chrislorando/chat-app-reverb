@@ -24,6 +24,7 @@ class ChatHeader extends Component
     public $isTabDocsOpen = false;
     public $isTabLinksOpen = false;
     public $isAddContactHeaderOpen = false;
+    public $previewUrl = null;
 
     public function mount($senderId, $authId)
     {
@@ -212,6 +213,16 @@ class ChatHeader extends Component
         ->orderBy('id', 'desc')
         ->get();
         // dd($this->links);
+    }
+
+    public function openPreview($url)
+    {
+        $this->previewUrl = $url;
+    }
+
+    public function closePreview()
+    {
+        $this->previewUrl = null;
     }
 
     public function render()

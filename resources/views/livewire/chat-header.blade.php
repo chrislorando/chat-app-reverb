@@ -129,9 +129,9 @@
         </button>
         <div class="grid grid-cols-4 gap-4">
             @foreach($thumbnails as $m)
-                <div class="h-20 flex items-center justify-center bg-gray-500/20 rounded-lg overflow-hidden">
+                <button type="button" wire:click="openPreview('{{ $m->file_url }}')" class="h-20 flex items-center justify-center bg-gray-500/20 rounded-lg overflow-hidden">
                     <img class="max-h-full max-w-full object-contain" src="{{ $m->file_url }}" alt="">
-                </div>
+                </button>
             @endforeach
         </div>
 
@@ -201,9 +201,9 @@
 
                         <div class="grid grid-cols-4 gap-4">
                             @foreach ($images as $image)
-                                <div class="h-20 flex items-center justify-center bg-gray-500/20 rounded-lg overflow-hidden">
+                                <button type="button" wire:click="openPreview('{{ $image->file_url }}')" class="h-20 flex items-center justify-center bg-gray-500/20 rounded-lg overflow-hidden">
                                     <img class="max-h-full max-w-full object-contain" src="{{$image->file_url}}" alt="">
-                                </div>
+                                </button>
                             @endforeach
                         </div>
                     @endforeach
@@ -366,5 +366,41 @@
 
         <livewire:chat-contact-form :key="'chat-contact-form-2'" :isNewRecord="false" />
 
+    </div>
+
+    <div wire:teleport="body">
+        @if($previewUrl)
+            <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+                <div class="relative w-full max-w-7xl max-h-full">
+                    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-800">
+                        <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600">
+                            <h3 class="text-xl font-medium text-gray-900 dark:text-white">
+                                Preview
+                            </h3>
+                            <div class="flex items-center gap-2">
+                                <!-- Download button -->
+                                <a href="{{ $previewUrl }}" download  class="text-white hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-800">
+                                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2m-8 1V4m0 12-4-4m4 4 4-4"/>
+                                    </svg>
+                                    <span class="sr-only">Download</span>
+                                </a>
+                                <!-- Close button -->
+                                <button wire:click="closePreview" type="button" 
+                                        class="text-white hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-800">
+                                    <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>
+                                    </svg>
+
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4 flex justify-center">
+                            <img src="{{ $previewUrl }}" class="max-h-[80vh] object-contain" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 </div>
