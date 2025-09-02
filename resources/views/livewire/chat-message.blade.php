@@ -160,7 +160,7 @@ forwardMsgId: null
                                 
                                    
                             @endif
-                            <p class="break-all text-sm font-normal py-2 text-gray-900 dark:text-white">
+                            <p id="message-content-{{ $row->id }}" class="break-all text-sm font-normal py-2 text-gray-900 dark:text-white">
                                 {{-- {{ $row->content }} --}}
                                 {!! nl2br(preg_replace_callback(
                                     '/(https?:\/\/[^\s]+)/',
@@ -169,6 +169,7 @@ forwardMsgId: null
                                 )) !!}
                             </p>
                             
+
                             <div class="flex justify-end space-x-2">
                                 <span class="text-xs font-normal text-gray-500 dark:text-gray-300">
                                     @if (\Carbon\Carbon::parse($row->timestamp)->isToday())
@@ -211,6 +212,24 @@ forwardMsgId: null
                                         <span>Reply</span>
                                     </button>
                                 </li>
+                                @if($row->message_type == 'Text')
+                                <li>
+                                     <button 
+                                        type="button" 
+                                        data-copy-to-clipboard-target="message-content-{{ $row->id }}" 
+                                        data-copy-to-clipboard-content-type="textContent" 
+                                        x-on:click="
+                                            const dropdown = FlowbiteInstances.getInstance('Dropdown', 'dropdownDots{{ $row->id }}');
+                                            dropdown?.hide();
+                                        " 
+                                        class="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                        <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M9 8v3a1 1 0 0 1-1 1H5m11 4h2a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-7a1 1 0 0 0-1 1v1m4 3v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7.13a1 1 0 0 1 .24-.65L7.7 8.35A1 1 0 0 1 8.46 8H13a1 1 0 0 1 1 1Z"/>
+                                        </svg>
+                                        <span>Copy</span>
+                                    </button>                                   
+                                </li>
+                                @endif
                                 <li>
                                     <button 
                                     type="button" 
@@ -290,233 +309,241 @@ forwardMsgId: null
             <div id="message_last">&nbsp;</div>
         </main>
 
+        
+
+        <!-- drawer component -->
         <footer class="bg-gray-800 shadow fixed bottom-0 md:left-96 left-0 right-0 md:z-20 z-10 p-2" style=" transform: none !important;">
-                <form 
-                wire:submit.prevent='send' 
-                x-data 
-                x-on:submit="window.dispatchEvent(new CustomEvent('close-picker'))"
-                >  
-             
-                    @if($targetMessageId && count($selectedContacts) == 0)
-                        <div class="flex justify-between">
-                            <blockquote class="relative w-full text-left rounded p-2 mt-2 mb-3 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-700">
-                                <div class="flex items-start justify-between">
-                                    <!-- Bagian kiri: sender + text -->
-                                    <div class="flex-1">
-                                        <span class="block text-xs text-gray-900 dark:text-green-400">
-                                            {{ $targetSender==auth()->user()->name ? "You" : $targetSender }}
-                                        </span>
+            <form 
+            wire:submit.prevent='send' 
+            x-data 
+            x-on:submit="window.dispatchEvent(new CustomEvent('close-picker'))"
+            >  
+            
+                @if($targetMessageId && count($selectedContacts) == 0)
+                    <div class="flex justify-between">
+                        <blockquote class="relative w-full text-left rounded p-2 mt-2 mb-3 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-700">
+                            <div class="flex items-start justify-between">
+                                <!-- Bagian kiri: sender + text -->
+                                <div class="flex-1">
+                                    <span class="block text-xs text-gray-900 dark:text-green-400">
+                                        {{ $targetSender==auth()->user()->name ? "You" : $targetSender }}
+                                    </span>
 
-                                        <div class="flex items-start gap-2 mt-1">
-                                            @if($targetMessageType == 'Document')
-                                                <svg class="w-5 h-5 mr-1 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
-                                                </svg>
-                                                <p id="targetMessage" class="text-sm text-gray-900 dark:text-white">
-                                                    {{ $targetMessageFileName }} {{ '(' . $targetMessageFileSize . ' kB) ' }}<br />
-                                                    {{ $targetMessageText }}
-                                                </p>
-                                            @else
-                                                <p id="targetMessage" class="text-sm text-gray-900 dark:text-white">
-                                                    {{ $targetMessageText }}
-                                                </p>
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    <!-- Bagian kanan: image + close -->
-                                    <div class="flex items-start gap-2 ml-2">
-                                        @if($targetMessageType == 'Image')
-                                            <img src="{{ $targetMessageFileUrl }}" class="h-12 w-12 object-cover rounded-lg" />
-                                        @endif
-
-                                        <button wire:click='clearReply' type="button"
-                                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
-                                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                    <div class="flex items-start gap-2 mt-1">
+                                        @if($targetMessageType == 'Document')
+                                            <svg class="w-5 h-5 mr-1 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
                                             </svg>
-                                            <span class="sr-only">Close</span>
-                                        </button>
+                                            <p id="targetMessage" class="text-sm text-gray-900 dark:text-white">
+                                                {{ $targetMessageFileName }} {{ '(' . $targetMessageFileSize . ' kB) ' }}<br />
+                                                {{ $targetMessageText }}
+                                            </p>
+                                        @else
+                                            <p id="targetMessage" class="text-sm text-gray-900 dark:text-white">
+                                                {{ $targetMessageText }}
+                                            </p>
+                                        @endif
                                     </div>
                                 </div>
-                            </blockquote>
 
+                                <!-- Bagian kanan: image + close -->
+                                <div class="flex items-start gap-2 ml-2">
+                                    @if($targetMessageType == 'Image')
+                                        <img src="{{ $targetMessageFileUrl }}" class="h-12 w-12 object-cover rounded-lg" />
+                                    @endif
+
+                                    <button wire:click='clearReply' type="button"
+                                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                        </svg>
+                                        <span class="sr-only">Close</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </blockquote>
+
+                    </div>
+                @endif
+
+                @if ($photo || $document) 
+                <div id="drawer-upload" class="fixed md:top-14 md:h-modal bottom-0 left-0 md:left-96 right-0 z-50 p-4 overflow-y-auto transition-transform bg-white dark:bg-gray-900 transform-none" tabindex="-1" aria-labelledby="drawer-bottom-label">
+                    <h5 id="drawer-bottom-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+                        <svg class="w-4 h-4 me-2.5" aria-modal="true" role="dialog" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                        </svg>
+                        {{ $photo?->getClientOriginalName() ?? $document?->getClientOriginalName() }}
+                    </h5>
+                    <button type="button" wire:click='closeUploadDrawer' data-drawer-hide="drawer-upload" aria-controls="drawer-upload" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                        <span class="sr-only">Close menu</span>
+                    </button>
+                    
+                    @if($photo)
+                        <div class="mb-2 p-4 h-full md:h-96 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex items-center justify-center">
+                            <img class="h-72 w-auto max-w-full object-contain" 
+                                src="{{ $photo->temporaryUrl() }}"
+                                alt="Preview image">
                         </div>
                     @endif
 
-                    @if ($photo || $document) 
-                    <div id="drawer-upload" class="fixed md:top-14 md:h-modal bottom-0 left-0 md:left-96 right-0 z-50 p-4 overflow-y-auto transition-transform bg-white dark:bg-gray-900 transform-none" tabindex="-1" aria-labelledby="drawer-bottom-label">
-                        <h5 id="drawer-bottom-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
-                            <svg class="w-4 h-4 me-2.5" aria-modal="true" role="dialog" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-                            </svg>
-                            {{ $photo?->getClientOriginalName() ?? $document?->getClientOriginalName() }}
-                        </h5>
-                        <button type="button" wire:click='closeUploadDrawer' data-drawer-hide="drawer-upload" aria-controls="drawer-upload" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
-                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                            </svg>
-                            <span class="sr-only">Close menu</span>
-                        </button>
-                        
-                        @if($photo)
-                            <div class="mb-2 p-4 h-full md:h-96 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex items-center justify-center">
-                                <img class="h-72 w-auto max-w-full object-contain" 
-                                    src="{{ $photo->temporaryUrl() }}"
-                                    alt="Preview image">
+                    @if($document)
+                        <div class="mb-4 flex items-center justify-center">    
+                            <div class="h-52 w-full max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 flex flex-col items-center justify-center text-center">
+                                <a href="#">
+                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">No preview available</h5>
+                                </a>
+                                <p class="font-normal text-gray-700 dark:text-gray-400">{{ $document->getSize() }} kB - {{  $document->getClientOriginalExtension() }}</p>
                             </div>
-                        @endif
-
-                        @if($document)
-                            <div class="mb-4 flex items-center justify-center">    
-                                <div class="h-52 w-full max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 flex flex-col items-center justify-center text-center">
-                                    <a href="#">
-                                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">No preview available</h5>
-                                    </a>
-                                    <p class="font-normal text-gray-700 dark:text-gray-400">{{ $document->getSize() }} kB - {{  $document->getClientOriginalExtension() }}</p>
-                                </div>
-                            </div>
-
-                        @endif
-
-                        <div class="flex-1 relative">
-                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-text" viewBox="0 0 16 16">
-                                <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
-                                <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6m0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
-                                </svg>
-                            </div>
-                            <input wire:model='targetMessageId' type="hidden" class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="false" />
-                        
-                            <input 
-                                key="upload-{{ now()->timestamp }}"
-                                wire:model.defer='message' 
-                                {{-- wire:keydown="typing"
-                                wire:keydown.debounce.1500ms="notTyping" --}}
-                                type="text" 
-                                id="message-upload" 
-                                class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:gray-blue-500 dark:focus:border-gray-500" placeholder="Type a message" autocomplete="off" />
-                            <button type="submit" class="text-white absolute end-2.5 bottom-2 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Send</button>
                         </div>
+
+                    @endif
+
+                    <div class="flex-1 relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-text" viewBox="0 0 16 16">
+                            <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+                            <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6m0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+                            </svg>
+                        </div>
+                        <input wire:model='targetMessageId' type="hidden" class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="false" />
+                    
+                        <input 
+                            key="upload-{{ now()->timestamp }}"
+                            wire:model.defer='message' 
+                            {{-- wire:keydown="typing"
+                            wire:keydown.debounce.1500ms="notTyping" --}}
+                            type="text" 
+                            id="message-upload" 
+                            class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:gray-blue-500 dark:focus:border-gray-500" placeholder="Type a message" autocomplete="off" />
+                        <button type="submit" class="text-white absolute end-2.5 bottom-2 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Send</button>
+                    </div>
+                </div>
+
+                @else
+                    <div id="drawer-upload"></div>
+                @endif
+
+
+                <label for="send" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Send</label>
+                
+                
+                <div class="relative flex items-end gap-2"
+                    x-data="{
+                        showPicker: false,
+                        insertEmoji(e) {
+                            $wire.addEmoji(e.detail.unicode);
+                            {{-- this.showPicker = false; --}}
+                        }
+                    }"
+                    @emoji-click="insertEmoji"
+                    @click.outside="showPicker = false"
+                    @keydown.escape.window="showPicker = false"
+                    @close-picker.window="showPicker = false">
+
+                    <button wire:loading.attr="disabled" id="dropdownTopButton" data-dropdown-toggle="dropdownTop" data-dropdown-offset-distance="10" data-dropdown-offset-skidding="74" data-dropdown-placement="top" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center" type="button">
+                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
+                        </svg>
+                    </button>
+
+                    <!-- Dropdown menu -->
+                    <div wire:loading.attr="disabled" id="dropdownTop" class="z-50 hidden bg-white rounded-lg shadow-sm w-48 dark:bg-gray-800">
+                        <ul class="py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton">
+                            <li data-drawer-target="drawer-upload">
+                                <label class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                                    <svg class="w-5 h-5 mr-2 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Document
+                                    <input type="file" wire:model="document" class="hidden" accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.csv,.ppt" />
+                                </label>
+                            </li>
+                            <li data-drawer-target="drawer-upload">
+                                <label class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                                    <svg class="w-5 h-5 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Photo
+                                    <input type="file" wire:model="photo" class="hidden" accept="image/*">
+                                </label>
+                            </li>
+                            {{-- <li>
+                                <button wire:click="openCamera" class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                    <svg class="me-2 w-6 h-6 text-red-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" d="M7.5 4.586A2 2 0 0 1 8.914 4h6.172a2 2 0 0 1 1.414.586L17.914 6H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1.086L7.5 4.586ZM10 12a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm2-4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Camera
+                                </button>
+                            </li> --}}
+                        </ul>
                     </div>
 
-                    @else
-                        <div id="drawer-upload"></div>
-                    @endif
-
-
-                    <label for="send" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Send</label>
+                    <button wire:loading.attr="disabled" type="button" @click="showPicker = !showPicker" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center">
+                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9h.01M8.99 9H9m12 3a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM6.6 13a5.5 5.5 0 0 0 10.81 0H6.6Z"/>
+                        </svg>
+                    </button>
                     
-                    
-                    <div class="relative flex items-center gap-2"
-                        x-data="{
-                            showPicker: false,
-                            insertEmoji(e) {
-                                $wire.addEmoji(e.detail.unicode);
-                                {{-- this.showPicker = false; --}}
-                            }
-                        }"
-                        @emoji-click="insertEmoji"
-                        @click.outside="showPicker = false"
-                        @keydown.escape.window="showPicker = false"
-                        @close-picker.window="showPicker = false">
+                    <emoji-picker 
+                        x-show="showPicker" 
+                        x-transition 
+                        class="absolute w-full bottom-16 z-50 mt-2 shadow-lg bg-white dark:bg-gray-800 border-gray-600 rounded-xl"
+                    ></emoji-picker>
 
-                        <button wire:loading.attr="disabled" id="dropdownTopButton" data-dropdown-toggle="dropdownTop" data-dropdown-offset-distance="10" data-dropdown-offset-skidding="74" data-dropdown-placement="top" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center" type="button">
-                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
-                            </svg>
-                        </button>
-
-                        <!-- Dropdown menu -->
-                        <div wire:loading.attr="disabled" id="dropdownTop" class="z-50 hidden bg-white rounded-lg shadow-sm w-48 dark:bg-gray-800">
-                            <ul class="py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton">
-                                <li data-drawer-target="drawer-upload">
-                                    <label class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
-                                        <svg class="w-5 h-5 mr-2 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
-                                        </svg>
-                                        Document
-                                        <input type="file" wire:model="document" class="hidden" accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.csv,.ppt" />
-                                    </label>
-                                </li>
-                                <li data-drawer-target="drawer-upload">
-                                    <label class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
-                                        <svg class="w-5 h-5 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
-                                        </svg>
-                                        Photo
-                                        <input type="file" wire:model="photo" class="hidden" accept="image/*">
-                                    </label>
-                                </li>
-                                {{-- <li>
-                                    <button wire:click="openCamera" class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                        <svg class="me-2 w-6 h-6 text-red-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                            <path fill-rule="evenodd" d="M7.5 4.586A2 2 0 0 1 8.914 4h6.172a2 2 0 0 1 1.414.586L17.914 6H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1.086L7.5 4.586ZM10 12a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm2-4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" clip-rule="evenodd"/>
-                                        </svg>
-                                        Camera
-                                    </button>
-                                </li> --}}
-                            </ul>
-                        </div>
-
-                        <button wire:loading.attr="disabled" type="button" @click="showPicker = !showPicker" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center">
-                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9h.01M8.99 9H9m12 3a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM6.6 13a5.5 5.5 0 0 0 10.81 0H6.6Z"/>
-                            </svg>
-                        </button>
-                        
-                        <emoji-picker 
-                            x-show="showPicker" 
-                            x-transition 
-                            class="absolute w-full bottom-16 z-50 mt-2 shadow-lg bg-white dark:bg-gray-800 border-gray-600 rounded-xl"
-                        ></emoji-picker>
-
-                        <div class="flex-1 relative">
-                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <div class="flex-1 relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3">
+                            <button type="button" data-tooltip-target="tooltip-helper" data-drawer-target="drawer-writing-helper" data-drawer-show="drawer-writing-helper" data-drawer-placement="bottom" data-drawer-backdrop="false" aria-controls="drawer-writing-helper">
                                 <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-text" viewBox="0 0 16 16">
-                                <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
-                                <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6m0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+                                    <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+                                    <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6m0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
                                 </svg>
+                            </button>
+
+                            <div id="tooltip-helper" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-800 border border-gray-600">
+                                Writing help
+                                <div class="tooltip-arrow" data-popper-arrow></div>
                             </div>
-                            <input wire:model='targetMessageId' type="hidden" class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="false" />
-                        
-                            @if (!$photo || !$document) 
-                                <textarea wire:ignore focus
-                                    type="text" 
-                                    id="message" 
+                        </div>
+                        <input wire:model='targetMessageId' type="hidden" placeholder="Type a message" autocomplete="false" />
+                    
+                        @if (!$photo || !$document) 
+                            <div class="flex items-end gap-2">
+                                <textarea
+                                    wire:ignore
+                                    id="message"
                                     key="{{ now()->timestamp }}"
-                                    class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500 resize-none overflow-hidden" 
-                                    style="min-height: 40px; max-height: 120px;"
-                                    rows="1"
+                                    class="flex-1 p-2.5 ps-10 pr-12 text-sm text-gray-500 border border-gray-300 rounded-xl bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
+                                    style="height: 0; max-height: 120px;"
                                     placeholder="Type a message"
                                     autocomplete="off"
-                                    wire:model.defer='message' 
+                                    wire:model.defer="message"
                                     wire:keydown="typing"
                                     wire:keyup.debounce.1500ms="notTyping"
-                                    rows="1"
-                                    x-data="{ resize() { $el.style.height = 'auto'; $el.style.height = Math.min($el.scrollHeight, 120) + 'px'; } }"
-                                    x-init="
-                                        resize(); 
-                                        $watch('$wire.message', () => resize());
-                                    "
+                                    x-data="{ resize() { $el.style.height = '0px'; $el.style.height = Math.min($el.scrollHeight, 120) + 'px'; } }"
+                                    x-init="resize(); $watch('$wire.message', () => resize());"
                                     x-on:input="resize()"
                                     x-on:keydown.enter="if (!event.shiftKey) { 
                                         event.preventDefault(); 
                                         $wire.send(); 
                                         window.dispatchEvent(new CustomEvent('close-picker')); 
                                     }"
-                                    >
-                                </textarea>
-                           
-                                <button type="submit" wire:offline.attr="disabled" @disabled(empty($message)) class="text-white absolute end-2.5 bottom-2 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                                    Send
+                                ></textarea>
+
+                                <button type="submit" wire:offline.attr="disabled" @disabled(empty($message))
+                                    class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-full text-sm p-2.5 dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-700">
+                                    <svg class="w-5 h-5 text-white transform rotate-90" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" d="M12 2a1 1 0 0 1 .932.638l7 18a1 1 0 0 1-1.326 1.281L13 19.517V13a1 1 0 1 0-2 0v6.517l-5.606 2.402a1 1 0 0 1-1.326-1.281l7-18A1 1 0 0 1 12 2Z" clip-rule="evenodd"/>
+                                    </svg>
                                 </button>
-                            @endif
-                        </div>
+                            </div>
+                        @endif
                     </div>
-                </form>
-              
+                </div>
+            </form>
         </footer>
 
         @if($models->count() > 0)
@@ -546,6 +573,84 @@ forwardMsgId: null
             </div>
         </div>
         
+        <!-- drawer component -->
+        <div 
+        wire:ignore.self 
+        id="drawer-writing-helper" 
+        class="border-t border-t-gray-700 fixed left-0 md:left-96 right-0 z-40 p-4 overflow-y-auto transition-transform bg-white dark:bg-gray-800 translate-y-full" tabindex="-1" aria-labelledby="drawer-writing-helper-label">
+            <div class="flex items-center justify-between mb-4">
+                <h5 id="drawer-writing-helper-label" class="flex items-center text-base font-semibold text-gray-500 dark:text-gray-400">
+                    <svg class="w-6 h-6 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.872 9.687 20 6.56 17.44 4 4 17.44 6.56 20 16.873 9.687Zm0 0-2.56-2.56M6 7v2m0 0v2m0-2H4m2 0h2m7 7v2m0 0v2m0-2h-2m2 0h2M8 4h.01v.01H8V4Zm2 2h.01v.01H10V6Zm2-2h.01v.01H12V4Zm8 8h.01v.01H20V12Zm-2 2h.01v.01H18V14Zm2 2h.01v.01H20V16Z"/>
+                    </svg>
+                    Writing help
+                </h5>
+                <button type="button" data-drawer-hide="drawer-writing-helper" aria-controls="drawer-writing-helper"
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                    <span class="sr-only">Close menu</span>
+                </button>
+            </div>
+
+            {{-- <p>{{$message}}</p> --}}
+            <div class="flex items-end gap-2">
+                <textarea
+                    wire:ignore
+                    id="message-helper"
+                    key="{{ now()->timestamp }}"
+                    class="flex-1 p-2.5 pr-12 text-sm text-gray-500 border border-gray-300 rounded-xl bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
+                    style="height: 0; max-height: 120px;"
+                    placeholder="Type a message"
+                    autocomplete="off"
+                    wire:model.defer="message"
+                    wire:keydown="typing"
+                    wire:keyup.debounce.1500ms="notTyping"
+                    x-data="{ resize() { $el.style.height = '0px'; $el.style.height = Math.min($el.scrollHeight, 120) + 'px'; } }"
+                    x-init="resize(); $watch('$wire.message', () => resize());"
+                    x-on:input="resize()"
+                    x-on:keydown.enter="if (!event.shiftKey) { 
+                        event.preventDefault(); 
+                        $wire.send(); 
+                        window.dispatchEvent(new CustomEvent('close-picker')); 
+                    }"
+                ></textarea>
+            </div>
+            <ul class="my-4 space-y-3">
+                <li>
+                    <button type="button" data-drawer-hide="drawer-writing-helper" wire:click="$set('message', 'Here at ChatsApp we focus on markets where technology');" class="flex items-center p-2 text-sm text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-700 dark:hover:bg-gray-500 dark:text-white">
+                        <span class="flex-1 text-left">
+                            Here at ChatsApp we focus on markets where technology
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" data-drawer-hide="drawer-writing-helper" wire:click="$set('message', 'Justru wire:teleport pas buat kasus kayak gini: list thumbnail → klik → tampilkan gambar besar');" class="flex items-center p-2 text-sm text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-700 dark:hover:bg-gray-500 dark:text-white">
+                        <span class="flex-1 text-left">
+                            Justru wire:teleport pas buat kasus kayak gini: list thumbnail → klik → tampilkan gambar besar
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" data-drawer-hide="drawer-writing-helper" wire:click="$set('message', 'The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor');" class="flex items-center p-2 text-sm text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-700 dark:hover:bg-gray-500 dark:text-white">
+                        <span class="flex-1 text-left">
+                            The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor
+                        </span>
+                    </button>
+                </li>
+            </ul>
+
+            <button type="button" class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-gray-500 dark:text-gray-300">Rephrase</button>
+            <button type="button" class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-gray-500 dark:text-gray-300">Professional</button>
+            <button type="button" class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-gray-500 dark:text-gray-300">Funny</button>
+            <button type="button" class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-gray-500 dark:text-gray-300">Supportive</button>
+            <button type="button" class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-gray-500 dark:text-gray-300">Proofread</button>
+
+
+
+        </div>
 
         <!-- Forward modal -->
         <div x-show="showForwardModal"
@@ -642,6 +747,7 @@ forwardMsgId: null
                 </div>
             </div>
         </div>
+
         @endif
     
     @else
@@ -708,6 +814,7 @@ forwardMsgId: null
                 </div>
             </div>
         </section>
+
 
         {{-- <a wire:navigate href="{{route('push')}}" class="btn btn-outline-primary btn-block">Make a Push Notification!</a> --}}
 
@@ -905,6 +1012,7 @@ forwardMsgId: null
             initFlowbite();
         });
     });
-   
+
+    
 </script>
 @endscript

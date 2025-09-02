@@ -96,13 +96,20 @@
 
                             </div>
                             <div class="flex-1 min-w-0 ms-4">
-                                @php($content = $row->latest_message?->content)
+                                @php($content = $row->latest_message?->content ? $row->latest_message?->content : $row->latest_message?->message_type)
 
                                 <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
                                     {{ $row->alias_name ?? $row->email ?? $row->name }} 
                                 </p>
 
-                                <p class="break-all text-sm text-gray-500 truncate dark:text-gray-400 flex" title="{{$content == '' ? $row->latest_message?->message_type : $content}}">
+                                <p class="break-all text-sm text-gray-500 truncate dark:text-gray-400 flex" title="{{$content}}">
+                                    
+                                    @if($row->latest_message?->sender?->name==auth()->user()->name)
+                                        {{'You: '}} 
+                                    @else
+                                        {{$row->latest_message?->sender?->name ? $row->latest_message?->sender?->name.': ' : ''}} 
+                                    @endif
+                                    
                                     @if($row->latest_message?->file_url)
                                         @if($row->latest_message?->message_type == 'Document')
                                             <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -131,7 +138,7 @@
                                         : $row->latest_message->file_name ?? $row->email }} --}}
 
                                     @if ($content)
-                                        {{ \Illuminate\Support\Str::limit($content, 35) }}
+                                        {{ \Illuminate\Support\Str::limit($content, 30) }}
                                     @else
                                         {{ $row->latest_message?->file_name ? \Illuminate\Support\Str::limit($row->latest_message?->file_name, 30) : $row->email }}
                                     @endif
