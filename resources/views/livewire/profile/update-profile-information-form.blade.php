@@ -115,7 +115,7 @@ new class extends Component
                 @endif
             </label>
 
-            <div x-show="uploading" class="mt-2 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+            <div x-show="uploading" class="mt-3 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                 <div class="bg-green-600 h-2 transition-all duration-200"
                     :style="`width: ${progress}%;`">
                 </div>
