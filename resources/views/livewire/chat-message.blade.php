@@ -495,7 +495,7 @@ forwardMsgId: null
                     <div class="flex-1 relative">
                         
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3">
-                            @if(trim($message) != '')
+                            @if($isOpenWsDrawer)
                                 <button type="button" wire:click='generateText' data-tooltip-target="tooltip-helper" data-drawer-target="drawer-writing-helper" data-drawer-show="drawer-writing-helper" data-drawer-placement="bottom" data-drawer-backdrop="false" aria-controls="drawer-writing-helper">
                                     <svg class="w-4 h-4 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-text" viewBox="0 0 16 16">
                                         <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
@@ -738,7 +738,7 @@ forwardMsgId: null
                 <ul wire:loading.remove wire:target="generateText, setWsCategory" class="my-4 space-y-3">
                     @foreach($generatedOptions as $option)
                         <li wire:key="option-{{$option}}">
-                            <button wire:loading.attr="disabled" type="button" data-drawer-hide="drawer-writing-helper" wire:click="$set('message', '{{$option}}');" class="w-full flex items-center p-2 text-sm text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-700 dark:hover:bg-gray-500 dark:text-white">
+                            <button wire:loading.attr="disabled" type="button" data-drawer-hide="drawer-writing-helper" wire:click="selectOption('{{$option}}')" class="w-full flex items-center p-2 text-sm text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-700 dark:hover:bg-gray-500 dark:text-white">
                                 <span class="flex-1 text-left">
                                     {{$option}}
                                 </span>

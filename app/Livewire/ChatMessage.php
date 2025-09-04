@@ -471,7 +471,12 @@ class ChatMessage extends Component
 
     public function updatedMessage()
     {
-        $this->isOpenWsDrawer = true;
+        if($this->message){
+            $this->isOpenWsDrawer = true;
+        }else{
+            $this->isOpenWsDrawer = false;
+        }
+        
     }
 
     public function setWsCategory($value)
@@ -520,6 +525,12 @@ class ChatMessage extends Component
         }
 
         $this->generatedOptions = $items;
+    }
+
+    public function selectOption($option)
+    {
+        $this->message = $option;
+        $this->isOpenWsDrawer = false;
     }
 
     public function closeWsDrawer()
