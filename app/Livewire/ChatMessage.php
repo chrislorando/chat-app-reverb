@@ -57,6 +57,7 @@ class ChatMessage extends Component
     public $wsCategories = ['Rephrase','Professional','Funny','Supportive','Proofread'];
     public $selectedWsCategory;
     public $generatedOptions = [];
+    public $errorMessage;
 
     public function mount()
     {
@@ -481,7 +482,7 @@ class ChatMessage extends Component
 
     public function generateText(AIServiceInterface $service)
     {
-        if (strlen($this->message) < 5 || !str_contains($this->message, ' ')) {
+        if (strlen($this->message) < 10) {
             return; 
         }
 
@@ -489,12 +490,22 @@ class ChatMessage extends Component
             return; 
         }
 
+        $words = explode(' ', strtolower($this->message));
+        if (count($words) < 3) {
+            return false;
+        }
+
         if($this->selectedWsCategory == ''){
             $this->selectedWsCategory = $this->wsCategories[0];
         }
 
-        $prompt = "Kamu adalah text transformer yang HANYA mengeluarkan hasil transformasi tanpa penjelasan, sapaan, atau penutup apapun. Ubah kalimat '{$this->message}' menjadi 3 versi {$this->selectedWsCategory} dengan kalimat panjang maksimal 150 karakter; gunakan bahasa natural sehari-hari. Keluaran: 3 baris.";
+        $prompt = "Kamu adalah text transformer yang HANYA mengeluarkan hasil transformasi tanpa penjelasan, sapaan, atau penutup apapun. Ubah kalimat '{$this->message}' menjadi 3 versi {$this->selectedWsCategory} dengan kalimat panjang maksimal 150 karakter; Gunakan bahasa yang sama dengan kalimat input tanpa menerjemahkan. Keluaran: 3 baris.";
         $rs = $service->generateText($prompt);
+
+        if($rs['error']==true){
+            $this->errorMessage = $rs['body']->error->message;
+            return;
+        }
 
         $lines = preg_split('/\r\n|\r|\n/', trim($rs['text']));
 
@@ -502,7 +513,8 @@ class ChatMessage extends Component
         foreach ($lines as $line) {
             $line = trim($line, "* \t\n\r\0\x0B");
             if ($line !== '') {
-                $clean = preg_replace('/[[:punct:]&&[^,.?!]]/', '', $line);
+                // $clean = preg_replace('/[[:punct:]&&[^,.?!]]/', '', $line);
+                $clean = preg_replace('/[^a-zA-Z0-9\s,.?!-]/u', '', $line);
                 $items[] = $clean;
             }
         }
@@ -515,6 +527,7 @@ class ChatMessage extends Component
         $this->isOpenWsDrawer = false;
         $this->message = '';
         $this->selectedWsCategory = null;
+        $this->generatedOptions = [];
     }
 
     public function render()

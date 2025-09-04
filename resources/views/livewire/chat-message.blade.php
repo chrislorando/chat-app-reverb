@@ -495,7 +495,7 @@ forwardMsgId: null
                     <div class="flex-1 relative">
                         
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3">
-                            @if(trim($message) != '' && strlen($message) > 5)
+                            @if(trim($message) != '')
                                 <button type="button" wire:click='generateText' data-tooltip-target="tooltip-helper" data-drawer-target="drawer-writing-helper" data-drawer-show="drawer-writing-helper" data-drawer-placement="bottom" data-drawer-backdrop="false" aria-controls="drawer-writing-helper">
                                     <svg class="w-4 h-4 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-text" viewBox="0 0 16 16">
                                         <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
@@ -584,6 +584,7 @@ forwardMsgId: null
         <!-- drawer component -->
         @if($isOpenWsDrawer)
         <div 
+        {{-- x-show="$wire.message" --}}
         wire:ignore.self 
         id="drawer-writing-helper" 
         class="border-t border-t-gray-700 fixed left-0 md:left-96 right-0 z-40 p-4 overflow-y-auto transition-transform bg-white dark:bg-gray-800 translate-y-full" tabindex="-1" aria-labelledby="drawer-writing-helper-label">
@@ -606,7 +607,7 @@ forwardMsgId: null
             </div>
 
             {{-- <p>{{$message}}</p> --}}
-            <div class="flex items-end gap-2" x-show="$wire.message">
+            <div class="flex items-end gap-2" x-show="$wire.isOpenWsDrawer">
                 <textarea
                     wire:ignore
                     id="message-helper"
@@ -637,7 +638,7 @@ forwardMsgId: null
                 <span class="sr-only">Loading...</span>
             </div>
            
-            <ul wire:loading.remove class="my-4 space-y-3">
+            <ul wire:loading.remove wire:target="generateText, setWsCategory" class="my-4 space-y-3">
                 @foreach($generatedOptions as $option)
                     <li wire:key="option-{{$option}}">
                         <button wire:loading.attr="disabled" type="button" data-drawer-hide="drawer-writing-helper" wire:click="$set('message', '{{$option}}');" class="w-full flex items-center p-2 text-sm text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-700 dark:hover:bg-gray-500 dark:text-white">
@@ -858,6 +859,24 @@ forwardMsgId: null
             </button>
         </div>
      </div>
+
+     @if($errorMessage)
+        <div id="toast-danger" class="z-50 fixed bottom-5 right-5 flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800" role="alert">
+            <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
+                </svg>
+                <span class="sr-only">Error icon</span>
+            </div>
+            <div class="ms-3 text-sm font-normal">{{$errorMessage}}</div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-danger" aria-label="Close">
+                <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+            </button>
+        </div>
+    @endif
 </div>
 
 @script

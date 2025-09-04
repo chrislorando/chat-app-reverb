@@ -8,6 +8,7 @@ return [
         'endpoint' => env('GEMINI_ENDPOINT', 'https://generativelanguage.googleapis.com/v1beta/models'),
         // 'model'    => env('GEMINI_IMAGE_MODEL', 'gemini-2.0-flash-preview-image-generation'),
         'model'    => env('GEMINI_IMAGE_MODEL', 'gemini-2.0-flash'),
+        'content_api'    => env('GEMINI_CONTENT_API', 'streamGenerateContent'),
     ],
 
     'openai' => [
