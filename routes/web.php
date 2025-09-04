@@ -46,7 +46,6 @@ Route::get('/push', function (Request $request) {
 Route::get('/chat/{uid}', function (Request $request, $uid) {
     session()->flash('openChatUid', $uid);
     return redirect()->route('dashboard');
-
 })
 ->middleware(['auth']);
 
@@ -72,17 +71,17 @@ Route::get('/download', function(Request $request){
     ]);
 })->middleware(['auth']);
 
-Route::get('/generate-sticker', function(AIServiceInterface $service){
-    $prompt = "Create a simple sticker of a happy cat with sunglasses, bright colors, and a fun, playful style.";
-    $url = $service->generateImage($prompt);
-    return response()->json($url);
-})->middleware(['auth']);
+// Route::get('/generate-sticker', function(AIServiceInterface $service){
+//     $prompt = "Create a simple sticker of a happy cat with sunglasses, bright colors, and a fun, playful style.";
+//     $url = $service->generateImage($prompt);
+//     return response()->json($url);
+// })->middleware(['auth']);
 
-Route::get('/generate-text', function(AIServiceInterface $service){
-    $prompt = "Ubah kalimat 'Let me know if you need something' menjadi 3 versi lucu dengan kalimat panjang. Tulis dalam bahasa aslinya. Hanya keluarkan daftar kalimat polos, satu baris per contoh, tanpa tambahan teks lain.";
-    $url = $service->generateText($prompt);
-    return response()->json($url);
-})->middleware(['auth']);
+// Route::get('/generate-text', function(AIServiceInterface $service){
+//     $prompt = "Ubah kalimat 'Let me know if you need something' menjadi 3 versi lucu dengan kalimat panjang. Tulis dalam bahasa aslinya. Hanya keluarkan daftar kalimat polos, satu baris per contoh, tanpa tambahan teks lain.";
+//     $url = $service->generateText($prompt);
+//     return response()->json($url);
+// })->middleware(['auth']);
 
 // Broadcast::routes(['middleware' => ['auth']]); 
 // Broadcast::routes(['middleware' => ['auth:api']]);
