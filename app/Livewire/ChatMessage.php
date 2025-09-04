@@ -481,8 +481,12 @@ class ChatMessage extends Component
 
     public function generateText(AIServiceInterface $service)
     {
-        if($this->message == ''){
-            return;
+        if (strlen($this->message) < 5 || !str_contains($this->message, ' ')) {
+            return; 
+        }
+
+        if (!preg_match('/[a-zA-Z]/', $this->message)) {
+            return; 
         }
 
         if($this->selectedWsCategory == ''){

@@ -8,6 +8,7 @@ pipeline {
         REVERB_APP_ID=credentials('REVERB_APP_ID')
         REVERB_APP_KEY=credentials('REVERB_APP_KEY')
         REVERB_APP_SECRET=credentials('REVERB_APP_SECRET')
+        GEMINI_API_KEY=credentials('GEMINI_API_KEY')
     }
 
     stages {
@@ -45,7 +46,8 @@ pipeline {
                 string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
                 string(credentialsId: 'REVERB_APP_ID', variable: 'REVERB_APP_ID'),
                 string(credentialsId: 'REVERB_APP_KEY', variable: 'REVERB_APP_KEY'),
-                string(credentialsId: 'REVERB_APP_SECRET', variable: 'REVERB_APP_SECRET')
+                string(credentialsId: 'REVERB_APP_SECRET', variable: 'REVERB_APP_SECRET'),
+                string(credentialsId: 'GEMINI_API_KEY', variable: 'GEMINI_API_KEY')
                 ]) 
                     {
                     sh """
@@ -66,6 +68,7 @@ pipeline {
                         docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_ID=.*|REVERB_APP_ID=${REVERB_APP_ID}|" .env'
                         docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_KEY=.*|REVERB_APP_KEY=${REVERB_APP_KEY}|" .env'
                         docker compose exec -T app sh -c 'sed -i "s|^REVERB_APP_SECRET=.*|REVERB_APP_SECRET=${REVERB_APP_SECRET}|" .env'
+                        docker compose exec -T app sh -c 'sed -i "s|^GEMINI_API_KEY=.*|GEMINI_API_KEY=${GEMINI_API_KEY}|" .env'
 
                         docker compose exec -T app php artisan webpush:vapid
                         
