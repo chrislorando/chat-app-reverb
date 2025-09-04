@@ -1,5 +1,6 @@
 import "./bootstrap";
 import "flowbite";
+// import { Drawer } from 'flowbite';
 
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 console.log('VAPID',window.VAPID_PUBLIC_KEY);

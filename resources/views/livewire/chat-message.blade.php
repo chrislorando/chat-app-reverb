@@ -312,7 +312,7 @@ forwardMsgId: null
         
 
         <!-- drawer component -->
-        <footer class="bg-gray-800 shadow fixed bottom-0 md:left-96 left-0 right-0 md:z-20 z-10 p-2" style=" transform: none !important;">
+        <footer class="bg-gray-800 shadow fixed bottom-0 md:left-96 left-0 right-0 md:z-20 z-10 p-3" style=" transform: none !important;">
             <form 
             wire:submit.prevent='send' 
             x-data 
@@ -414,8 +414,6 @@ forwardMsgId: null
                         <input 
                             key="upload-{{ now()->timestamp }}"
                             wire:model.defer='message' 
-                            {{-- wire:keydown="typing"
-                            wire:keydown.debounce.1500ms="notTyping" --}}
                             type="text" 
                             id="message-upload" 
                             class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:gray-blue-500 dark:focus:border-gray-500" placeholder="Type a message" autocomplete="off" />
@@ -444,14 +442,14 @@ forwardMsgId: null
                     @keydown.escape.window="showPicker = false"
                     @close-picker.window="showPicker = false">
 
-                    <button wire:loading.attr="disabled" id="dropdownTopButton" data-dropdown-toggle="dropdownTop" data-dropdown-offset-distance="10" data-dropdown-offset-skidding="74" data-dropdown-placement="top" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-1 py-2.5 text-center inline-flex items-center" type="button">
+                    <button wire:loading.attr="disabled" id="dropdownTopButton" data-dropdown-toggle="dropdownTop" data-dropdown-offset-distance="14" data-dropdown-offset-skidding="74" data-dropdown-placement="top" class="text-gray-800 dark:text-white font-medium rounded-lg text-sm px-0 py-2.5 text-center inline-flex items-center" type="button">
                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
                         </svg>
                     </button>
 
                     <!-- Dropdown menu -->
-                    <div wire:loading.attr="disabled" id="dropdownTop" class="z-50 hidden bg-white rounded-lg shadow-sm w-48 dark:bg-gray-800">
+                    <div wire:loading.attr="disabled" id="dropdownTop" class="z-50 hidden bg-white rounded-lg shadow-sm w-48 dark:bg-gray-800 border border-gray-600">
                         <ul class="py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton">
                             <li data-drawer-target="drawer-upload">
                                 <label class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
@@ -495,19 +493,29 @@ forwardMsgId: null
                     ></emoji-picker>
 
                     <div class="flex-1 relative">
+                        
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3">
-                            <button type="button" data-tooltip-target="tooltip-helper" data-drawer-target="drawer-writing-helper" data-drawer-show="drawer-writing-helper" data-drawer-placement="bottom" data-drawer-backdrop="false" aria-controls="drawer-writing-helper">
-                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-text" viewBox="0 0 16 16">
-                                    <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
-                                    <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6m0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
-                                </svg>
-                            </button>
+                            @if($message!='')
+                                <button type="button" wire:click='generateText' data-tooltip-target="tooltip-helper" data-drawer-target="drawer-writing-helper" data-drawer-show="drawer-writing-helper" data-drawer-placement="bottom" data-drawer-backdrop="false" aria-controls="drawer-writing-helper">
+                                    <svg class="w-4 h-4 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-text" viewBox="0 0 16 16">
+                                        <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+                                        <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6m0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+                                    </svg>
+                                </button>
 
-                            <div id="tooltip-helper" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-800 border border-gray-600">
-                                Writing help
-                                <div class="tooltip-arrow" data-popper-arrow></div>
-                            </div>
+                                <div id="tooltip-helper" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-800 border border-gray-600">
+                                    Writing help
+                                    <div class="tooltip-arrow" data-popper-arrow></div>
+                                </div>
+                            @else
+                                <button type="button">
+                                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v7m0 7v-7m4-7v14m3-14H8.5A3.5 3.5 0 0 0 5 8.5v0A3.5 3.5 0 0 0 8.5 12H12"/>
+                                    </svg>
+                                </button>
+                            @endif
                         </div>
+                        
                         <input wire:model='targetMessageId' type="hidden" placeholder="Type a message" autocomplete="false" />
                     
                         @if (!$photo || !$document) 
@@ -516,7 +524,7 @@ forwardMsgId: null
                                     wire:ignore
                                     id="message"
                                     key="{{ now()->timestamp }}"
-                                    class="flex-1 p-2.5 ps-10 pr-12 text-sm text-gray-500 border border-gray-300 rounded-xl bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
+                                    class="flex-1 p-2.5 ps-10 text-sm text-gray-500 border border-gray-300 rounded-xl bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
                                     style="height: 0; max-height: 120px;"
                                     placeholder="Type a message"
                                     autocomplete="off"
@@ -574,10 +582,12 @@ forwardMsgId: null
         </div>
         
         <!-- drawer component -->
+        @if($isOpenWsDrawer)
         <div 
         wire:ignore.self 
         id="drawer-writing-helper" 
         class="border-t border-t-gray-700 fixed left-0 md:left-96 right-0 z-40 p-4 overflow-y-auto transition-transform bg-white dark:bg-gray-800 translate-y-full" tabindex="-1" aria-labelledby="drawer-writing-helper-label">
+        
             <div class="flex items-center justify-between mb-4">
                 <h5 id="drawer-writing-helper-label" class="flex items-center text-base font-semibold text-gray-500 dark:text-gray-400">
                     <svg class="w-6 h-6 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -596,12 +606,11 @@ forwardMsgId: null
             </div>
 
             {{-- <p>{{$message}}</p> --}}
-            <div class="flex items-end gap-2">
+            <div class="flex items-end gap-2" x-show="$wire.message">
                 <textarea
                     wire:ignore
                     id="message-helper"
-                    key="{{ now()->timestamp }}"
-                    class="flex-1 p-2.5 pr-12 text-sm text-gray-500 border border-gray-300 rounded-xl bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
+                    class="flex-1 p-2.5 text-sm text-gray-500 border border-gray-300 rounded-xl bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
                     style="height: 0; max-height: 120px;"
                     placeholder="Type a message"
                     autocomplete="off"
@@ -618,39 +627,48 @@ forwardMsgId: null
                     }"
                 ></textarea>
             </div>
-            <ul class="my-4 space-y-3">
-                <li>
-                    <button type="button" data-drawer-hide="drawer-writing-helper" wire:click="$set('message', 'Here at ChatsApp we focus on markets where technology');" class="flex items-center p-2 text-sm text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-700 dark:hover:bg-gray-500 dark:text-white">
-                        <span class="flex-1 text-left">
-                            Here at ChatsApp we focus on markets where technology
-                        </span>
-                    </button>
-                </li>
-                <li>
-                    <button type="button" data-drawer-hide="drawer-writing-helper" wire:click="$set('message', 'Justru wire:teleport pas buat kasus kayak gini: list thumbnail → klik → tampilkan gambar besar');" class="flex items-center p-2 text-sm text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-700 dark:hover:bg-gray-500 dark:text-white">
-                        <span class="flex-1 text-left">
-                            Justru wire:teleport pas buat kasus kayak gini: list thumbnail → klik → tampilkan gambar besar
-                        </span>
-                    </button>
-                </li>
-                <li>
-                    <button type="button" data-drawer-hide="drawer-writing-helper" wire:click="$set('message', 'The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor');" class="flex items-center p-2 text-sm text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-700 dark:hover:bg-gray-500 dark:text-white">
-                        <span class="flex-1 text-left">
-                            The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor
-                        </span>
-                    </button>
-                </li>
+
+            <hr class="h-px my-5 bg-gray-200 border-0 dark:bg-gray-700">
+
+            <div wire:loading wire:target="generateText, setWsCategory" role="status" class="animate-pulse w-full">
+                <div class="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-full mb-3 p-2"></div>
+                <div class="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-full mb-3 p-2"></div>
+                <div class="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-full mb-3 p-2"></div>
+                <span class="sr-only">Loading...</span>
+            </div>
+           
+            <ul wire:loading.remove class="my-4 space-y-3">
+                @foreach($generatedOptions as $option)
+                    <li wire:key="option-{{$option}}">
+                        <button wire:loading.attr="disabled" type="button" data-drawer-hide="drawer-writing-helper" wire:click="$set('message', '{{$option}}');" class="w-full flex items-center p-2 text-sm text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-700 dark:hover:bg-gray-500 dark:text-white">
+                            <span class="flex-1 text-left">
+                                {{$option}}
+                            </span>
+                        </button>
+                    </li>
+                @endforeach
             </ul>
 
-            <button type="button" class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-gray-500 dark:text-gray-300">Rephrase</button>
-            <button type="button" class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-gray-500 dark:text-gray-300">Professional</button>
-            <button type="button" class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-gray-500 dark:text-gray-300">Funny</button>
-            <button type="button" class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-gray-500 dark:text-gray-300">Supportive</button>
-            <button type="button" class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-gray-500 dark:text-gray-300">Proofread</button>
+            <div class="text-center">
+                <button wire:click='generateText' type="button" class="text-gray-700 border border-gray-700 hover:bg-gray-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:focus:ring-gray-700 dark:hover:bg-gray-500">
+                    <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.651 7.65a7.131 7.131 0 0 0-12.68 3.15M18.001 4v4h-4m-7.652 8.35a7.13 7.13 0 0 0 12.68-3.15M6 20v-4h4"/>
+                    </svg>
 
+                    <span class="sr-only">Icon description</span>
+                </button>
+            </div>
+            
 
+            <hr class="h-px my-5 bg-gray-200 border-0 dark:bg-gray-700">
 
+            <div class="text-center">
+                @foreach($wsCategories as $cat)
+                    <button wire:key="option-{{$cat}}" wire:loading.attr="disabled" type="button" wire:click="setWsCategory('{{$cat}}')" class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full {{$selectedWsCategory==$cat ? 'dark:bg-green-500 dark:text-gray-300' : 'dark:bg-gray-500 dark:text-gray-300'}}">{{$cat}}</button>
+                @endforeach
+            </div>
         </div>
+        @endif
 
         <!-- Forward modal -->
         <div x-show="showForwardModal"

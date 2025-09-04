@@ -9,6 +9,7 @@ use App\Events\UserTyping;
 use App\Models\Contact;
 use App\Models\User;
 use App\Notifications\PushMessageBrowser;
+use App\Services\AI\AIServiceInterface;
 use Illuminate\Support\Facades\Broadcast;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Renderless;
@@ -52,6 +53,10 @@ class ChatMessage extends Component
     public $contactList = [];
     public $searchContact = '';
     public $selectedContacts = [];
+    public $isOpenWsDrawer = false;
+    public $wsCategories = ['Rephrase','Professional','Funny','Supportive','Proofread'];
+    public $selectedWsCategory;
+    public $generatedOptions = [];
 
     public function mount()
     {
@@ -253,6 +258,7 @@ class ChatMessage extends Component
 
         event(new MessageSent(auth()->id(), $this->uid, true));
         $this->closeUploadDrawer();
+        $this->closeWsDrawer();
         // event(new UserOnline(auth()->id(),  true));
 
         // $this->dispatch('read-chat')->to(ChatList::class);
@@ -460,6 +466,51 @@ class ChatMessage extends Component
         $this->dispatch('save-forwarded-message');
 
         // dd($this->selectedContacts, $this->targetMessageId, $this->targetMessageText);
+    }
+
+    public function updatedMessage()
+    {
+        $this->isOpenWsDrawer = true;
+    }
+
+    public function setWsCategory($value)
+    {
+        $this->selectedWsCategory = $value;    
+        $this->generateText(app(AIServiceInterface::class));
+    }
+
+    public function generateText(AIServiceInterface $service)
+    {
+        if($this->message == ''){
+            return;
+        }
+
+        if($this->selectedWsCategory == ''){
+            $this->selectedWsCategory = $this->wsCategories[0];
+        }
+
+        $prompt = "Kamu adalah text transformer yang HANYA mengeluarkan hasil transformasi tanpa penjelasan, sapaan, atau penutup apapun. Ubah kalimat '{$this->message}' menjadi 3 versi {$this->selectedWsCategory} dengan kalimat panjang maksimal 150 karakter; gunakan bahasa natural sehari-hari. Keluaran: 3 baris.";
+        $rs = $service->generateText($prompt);
+
+        $lines = preg_split('/\r\n|\r|\n/', trim($rs['text']));
+
+        $items = [];
+        foreach ($lines as $line) {
+            $line = trim($line, "* \t\n\r\0\x0B");
+            if ($line !== '') {
+                $clean = preg_replace('/[[:punct:]&&[^,.?!]]/', '', $line);
+                $items[] = $clean;
+            }
+        }
+
+        $this->generatedOptions = $items;
+    }
+
+    public function closeWsDrawer()
+    {
+        $this->isOpenWsDrawer = false;
+        $this->message = '';
+        $this->selectedWsCategory = null;
     }
 
     public function render()

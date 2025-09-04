@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\AI\AIServiceInterface;
+use App\Services\AI\GeminiService;
 use Illuminate\Support\ServiceProvider;
 use URL;
 
@@ -12,7 +14,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(AIServiceInterface::class, GeminiService::class);
     }
 
     /**

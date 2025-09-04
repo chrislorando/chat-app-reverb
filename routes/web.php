@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Notifications\PushMessageBrowser;
+use App\Services\AI\AIServiceInterface;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 // Route::view('/', 'welcome');
@@ -55,7 +56,7 @@ Route::get('/download', function(Request $request){
     $parsedPath = parse_url($fullUrl, PHP_URL_PATH); 
     $relativePath = ltrim($parsedPath, '/chat-reverb/');
 
-    $originalName = basename($relativePath); // abc.pdf
+    $originalName = basename($relativePath);
     $extension = pathinfo($originalName, PATHINFO_EXTENSION);
 
     $customName = 'ChatsApp_'. now()->format('YmdHis').'.' . $extension;
@@ -69,6 +70,18 @@ Route::get('/download', function(Request $request){
         'Content-Length' => Storage::disk('s3')->size($relativePath),
         'Content-Disposition' => 'attachment; filename="'.$customName.'"',
     ]);
+})->middleware(['auth']);
+
+Route::get('/generate-sticker', function(AIServiceInterface $service){
+    $prompt = "Create a simple sticker of a happy cat with sunglasses, bright colors, and a fun, playful style.";
+    $url = $service->generateImage($prompt);
+    return response()->json($url);
+})->middleware(['auth']);
+
+Route::get('/generate-text', function(AIServiceInterface $service){
+    $prompt = "Ubah kalimat 'Let me know if you need something' menjadi 3 versi lucu dengan kalimat panjang. Tulis dalam bahasa aslinya. Hanya keluarkan daftar kalimat polos, satu baris per contoh, tanpa tambahan teks lain.";
+    $url = $service->generateText($prompt);
+    return response()->json($url);
 })->middleware(['auth']);
 
 // Broadcast::routes(['middleware' => ['auth']]); 
