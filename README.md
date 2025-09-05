@@ -33,8 +33,8 @@ A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind C
 🟢 **Online/offline status**  
 📁 **File uploads** (photos & documents)  
 🎨 **Modern UI** with Tailwind CSS  
-⚡ **Interactive components** with Livewire & Alpine.js
-🧠 **Message rephraser** with Gemini AI integration
+⚡ **Interactive components** with Livewire & Alpine.js  
+🧠 **Message rephraser** with Gemini AI integration  
 
 ## Tech Stack
 - [Laravel](https://laravel.com/) — Backend framework
