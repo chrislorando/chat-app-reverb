@@ -16,7 +16,7 @@
       <img src="https://github.com/user-attachments/assets/8f3b01ca-9b48-4f1a-a699-ba2f22a9a3fd" width="100%">
     </td>
     <td>
-      <strong>Writing help with gemini-2.0-flash-lite</strong><br>
+      <strong>Writing help/Message rephraser</strong><br>
       <img src="https://github.com/user-attachments/assets/66b309c8-3740-4801-b5d5-19ef6c374caf" width="100%">
     </td>
   </tr>
@@ -38,12 +38,11 @@ A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind C
 
 ## Tech Stack
 - [Laravel](https://laravel.com/) — Backend framework
-- [Laravel Reverb](https://reverb.laravel.com/) — First-party WebSocket server for Laravel applications
+- [Laravel Reverb](https://reverb.laravel.com/) — Real-time WebSocket server for Laravel applications
 - [Livewire](https://livewire.laravel.com/) — Reactive components without JavaScript
 - [Alpine.js](https://alpinejs.dev/) — Lightweight JS framework for interactivity
 - [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework
 - [Flowbite](https://flowbite.com/) — Tailwind UI components
-- [Laravel Reverb](https://laravel.com/docs/reverb) — Real-time WebSocket server
 - [SQLite](https://www.sqlite.org/) — Lightweight database for local development
 - [Nginx](https://nginx.org/) — HTTP web server
 - [Gemini AI](https://ai.google.dev/gemini-api/docs) — LLMs for message rephraser
