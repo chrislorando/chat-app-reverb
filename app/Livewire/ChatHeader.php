@@ -31,6 +31,9 @@ class ChatHeader extends Component
         $this->senderId = $senderId;
         $this->authId = $authId;
 
+        $this->isProfileOpen = false;
+        $this->isMediaOpen = false;
+
         // Initialize the user model with the sender's ID (Incoming messages)
         $this->userModel = User::find($this->senderId);
         $this->thumbnails = Message::whereIn('message_type', ['Image'])
@@ -136,13 +139,13 @@ class ChatHeader extends Component
         $this->isTabLinksOpen = false;
     }
 
-    #[On('toggle-contact-header')]
+    // #[On('toggle-contact-header')]
     public function toggleContactHeader($user = null)
     {
         $this->isAddContactHeaderOpen = !$this->isAddContactHeaderOpen;
-        if($user){
-            $this->dispatch('set-contact-user', user:$user);
-        }
+        // if($user){
+        //     $this->dispatch('set-contact-user', isNewRecord:false, user:$user);
+        // }
         
     }
 

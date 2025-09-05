@@ -15,6 +15,7 @@ class ChatContactForm extends Component
     public $full_name;
     public $email;
     public bool $isNewRecord = true;
+    public bool $isExists = false;
 
     // protected $rules = [
     //     'full_name' => 'required|string|max:255',
@@ -26,24 +27,52 @@ class ChatContactForm extends Component
     //     ]
     // ];
 
-    public function mount(bool $isNewRecord = true)
+    public function mount(bool $isNewRecord = true, User $user)
     {
         $this->isNewRecord = $isNewRecord;
-    }
-
-    #[On('set-contact-user')]
-    public function setContactUser(User $user)
-    {
-        if($this->isNewRecord){
+        if($isNewRecord){
             $this->acquaintance_id = null;
             $this->full_name = null;
             $this->email = null;
         }
 
-        if(!$this->isNewRecord){
+        if(!$isNewRecord){
             $this->acquaintance_id = $user->id;
             $this->full_name = $user->alias_name ?? $user->name;
             $this->email = $user->email;
+        }
+    }
+
+    #[On('set-contact-user')]
+    public function setContactUser($isNewRecord=true, User $user)
+    {
+        if($isNewRecord){
+            $this->acquaintance_id = null;
+            $this->full_name = null;
+            $this->email = null;
+        }
+
+        if(!$isNewRecord){
+            $this->acquaintance_id = $user->id;
+            $this->full_name = $user->alias_name ?? $user->name;
+            $this->email = $user->email;
+        }
+        
+    }
+
+    public function updatedEmail()
+    {
+        $this->resetErrorBag();
+        $user = User::where('email', $this->email)->first();
+        if($user){
+            $isExists = Contact::where('user_id', auth()->id())
+            ->where('acquaintance_id', $user->id)
+            ->exists();
+
+            $this->isExists = $isExists && $this->isNewRecord ? true : false;
+            $this->acquaintance_id = $user->id;
+        }else{
+            $this->isExists = false;
         }
         
     }
@@ -56,7 +85,9 @@ class ChatContactForm extends Component
                 'required',
                 'email',
                 'max:255',
-                $this->isNewRecord ? Rule::unique('contacts', 'acquaintance_id') : Rule::unique('contacts', 'acquaintance_id')->ignore('user_id', auth()->id()),
+                Rule::unique('contacts')
+                ->where(fn ($q) => $q->where('user_id', auth()->id()))
+                ->ignore($this->acquaintance_id),
             ],
         ]);
 
@@ -80,16 +111,19 @@ class ChatContactForm extends Component
             : null;
 
         $contact->save();
-     
-        if($this->isNewRecord){
-            $this->reset();
-        }
-        
 
         session()->flash('success', 'Contact saved.');
 
-        $this->dispatch('chat', uid:$contact->acquaintance_id)->to(ChatList::class);
     
+        if($this->isNewRecord){
+            $this->resetExcept('acquaintance_id');
+            // $this->dispatch('chat', uid:$contact->acquaintance_id)->to(ChatList::class);
+        }
+    }
+
+    public function dispatchToChat()
+    {
+        $this->dispatch('chat', uid:$this->acquaintance_id)->to(ChatList::class);
     }
 
     public function destroy($contactId)

@@ -5,6 +5,8 @@
 ![image](https://github.com/user-attachments/assets/730b8f76-4f89-48e3-9cc6-fbf98d77e883)
 **View profile**
 ![image](https://github.com/user-attachments/assets/8f3b01ca-9b48-4f1a-a699-ba2f22a9a3fd)
+**Writing help with gemini-2.0-flash-lite**
+![image](https://github.com/user-attachments/assets/66b309c8-3740-4801-b5d5-19ef6c374caf)
 
 
 A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind CSS, and Reverb. This project serves both as a learning medium to deepen my understanding of modern web development technologies and as a showcase piece for my professional portfolio. The app demonstrates modern Laravel real-time capabilities with a minimal stack.
@@ -17,6 +19,7 @@ A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind C
 📁 **File uploads** (photos & documents)  
 🎨 **Modern UI** with Tailwind CSS  
 ⚡ **Interactive components** with Livewire & Alpine.js
+🧠 **Smart replies** with Gemini AI integration
 
 ## Tech Stack
 - [Laravel](https://laravel.com/) — Backend framework
@@ -28,6 +31,7 @@ A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind C
 - [Laravel Reverb](https://laravel.com/docs/reverb) — Real-time WebSocket server
 - [SQLite](https://www.sqlite.org/) — Lightweight database for local development
 - [Nginx](https://nginx.org/) — HTTP web server
+- [Gemini AI](https://ai.google.dev/gemini-api/docs) — LLMs
 
 ## Installation Guide
 
@@ -75,6 +79,12 @@ A real-time chat application built with Laravel, Livewire, Alpine.js, Tailwind C
    REVERB_APP_SECRET=somesecret
    REVERB_HOST=127.0.0.1
    REVERB_PORT=8080
+
+   AI_PROVIDER=gemini
+   GEMINI_API_KEY=12345678
+   GEMINI_IMAGE_MODEL=gemini-2.0-flash-lite
+   GEMINI_CONTENT_API="generateContent"
+   GEMINI_ENDPOINT=https://generativelanguage.googleapis.com/v1beta/models
 
 7. **Build assets**
    ```bash
