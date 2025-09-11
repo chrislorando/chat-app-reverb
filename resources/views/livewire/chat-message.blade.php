@@ -270,7 +270,18 @@ forwardMsgId: null
 
 
         <!-- drawer component -->
-        <footer class="bg-gray-800 shadow fixed bottom-0 md:left-96 left-0 right-0 md:z-20 z-10 p-3" style=" transform: none !important;">
+        <footer class="bg-gray-800 shadow fixed bottom-0 md:left-96 left-0 right-0 md:z-20 z-10 p-3" style=" transform: none !important;"
+        x-data="{ uploading: false, progress: 0 }"
+        x-on:livewire-upload-start="uploading = true"
+        x-on:livewire-upload-finish="uploading = false"
+        x-on:livewire-upload-cancel="uploading = false"
+        x-on:livewire-upload-error="uploading = false"
+        x-on:livewire-upload-progress="progress = $event.detail.progress">
+  
+            <div x-show="uploading" class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+                <div max="100" x-bind:value="progress" class="bg-green-600 h-2.5 rounded-full dark:bg-green-500" style="width: 45%"></div>
+            </div>
+
             <form 
             wire:submit.prevent='send' 
             x-data 
@@ -326,58 +337,61 @@ forwardMsgId: null
                 @endif
 
                 @if ($photo || $document) 
-                <div id="drawer-upload" class="fixed md:top-14 md:h-modal bottom-0 left-0 md:left-96 right-0 z-50 p-4 overflow-y-auto transition-transform bg-white dark:bg-gray-900 transform-none" tabindex="-1" aria-labelledby="drawer-bottom-label">
-                    <h5 id="drawer-bottom-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
-                        <svg class="w-4 h-4 me-2.5" aria-modal="true" role="dialog" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-                        </svg>
-                        {{ $photo?->getClientOriginalName() ?? $document?->getClientOriginalName() }}
-                    </h5>
-                    <button type="button" wire:click='closeUploadDrawer' data-drawer-hide="drawer-upload" aria-controls="drawer-upload" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
-                        <svg class="w-3 h-3"  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                        </svg>
-                        <span class="sr-only">Close menu</span>
-                    </button>
-                    
-                    @if($photo)
-                        <div class="mb-2 p-4 h-full md:h-96 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex items-center justify-center">
-                            <img class="h-72 w-auto max-w-full object-contain" 
-                                src="{{ $photo->temporaryUrl() }}"
-                                alt="Preview image">
-                        </div>
-                    @endif
-
-                    @if($document)
-                        <div class="mb-4 flex items-center justify-center">    
-                            <div class="h-52 w-full max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 flex flex-col items-center justify-center text-center">
-                                <a href="#">
-                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">No preview available</h5>
-                                </a>
-                                <p class="font-normal text-gray-700 dark:text-gray-400">{{ $document->getSize() }} kB - {{  $document->getClientOriginalExtension() }}</p>
-                            </div>
-                        </div>
-
-                    @endif
-
-                    <div class="flex-1 relative">
-                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400"  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-text" viewBox="0 0 16 16">
-                            <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
-                            <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6m0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+                    <div id="drawer-upload" class="fixed md:top-16 md:h-modal bottom-0 left-0 md:left-96 right-0 z-50 p-4 overflow-y-auto transition-transform bg-white dark:bg-gray-900 transform-none" tabindex="-1" aria-labelledby="drawer-bottom-label">
+                        <h5 id="drawer-bottom-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+                            <svg class="w-4 h-4 me-2.5" aria-modal="true" role="dialog" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
                             </svg>
+                            {{ $photo?->getClientOriginalName() ?? $document?->getClientOriginalName() }}
+                        </h5>
+                        <button type="button" wire:click='closeUploadDrawer' data-drawer-hide="drawer-upload" aria-controls="drawer-upload" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
+                            <svg class="w-3 h-3"  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                            </svg>
+                            <span class="sr-only">Close menu</span>
+                        </button>
+                        
+                        @if($photo)
+                            <div class="mb-2 p-4 h-full md:h-96 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex items-center justify-center">
+                                <img class="h-72 w-auto max-w-full object-contain" 
+                                    src="{{ $photo->temporaryUrl() }}"
+                                    alt="Preview image">
+                            </div>
+                        @endif
+
+                        @if($document)
+                            <div class="mb-4 flex items-center justify-center">    
+                                <div class="h-52 w-full max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 flex flex-col items-center justify-center text-center">
+                                    <a href="#">
+                                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">No preview available</h5>
+                                    </a>
+                                    <p class="font-normal text-gray-700 dark:text-gray-400">{{ $document->getSize() }} kB - {{  $document->getClientOriginalExtension() }}</p>
+                                </div>
+                            </div>
+
+                        @endif
+
+                        <div class="flex-1 relative">
+                            @if ($errors->has('photo') || $errors->has('document'))
+                                <p class="text-red-400">{{ $errors->first('photo') ?: $errors->first('document') }}</p>
+                            @else
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400"  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-text" viewBox="0 0 16 16">
+                                    <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+                                    <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6m0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+                                    </svg>
+                                </div>
+                                <input wire:model='targetMessageId' type="hidden" class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="false" />
+                                <input 
+                                    key="upload-{{ now()->timestamp }}"
+                                    wire:model.defer='message' 
+                                    type="text" 
+                                    id="message-upload" 
+                                    class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:gray-blue-500 dark:focus:border-gray-500" placeholder="Type a message" autocomplete="off" />
+                                <button type="submit" class="text-white absolute end-2.5 bottom-2 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Send</button>
+                            @endif 
                         </div>
-                        <input wire:model='targetMessageId' type="hidden" class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type a message" autocomplete="false" />
-                    
-                        <input 
-                            key="upload-{{ now()->timestamp }}"
-                            wire:model.defer='message' 
-                            type="text" 
-                            id="message-upload" 
-                            class="block w-full p-3 ps-10 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:gray-blue-500 dark:focus:border-gray-500" placeholder="Type a message" autocomplete="off" />
-                        <button type="submit" class="text-white absolute end-2.5 bottom-2 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-1 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Send</button>
                     </div>
-                </div>
 
                 @else
                     <div id="drawer-upload"></div>

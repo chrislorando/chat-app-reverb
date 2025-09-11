@@ -46,6 +46,8 @@ class ChatMessage extends Component
     
     #[Validate('image|max:1024')]
     public $photo;
+
+    #[Validate('file|max:1024')]
     public $document;
     public $cameraImage;
     public $showCamera = false;
@@ -103,13 +105,22 @@ class ChatMessage extends Component
         $this->message .= $emoji;
     }
 
+    public function updatedPhoto()
+    {
+        $this->resetErrorBag('document');
+    }
+
+    public function updatedDocument()
+    {
+        $this->resetErrorBag('photo');
+    }
 
     public function send()
     {
         $this->validate([
             'message' => 'nullable|string',
-            'photo' => 'nullable|image|max:1024', // 10MB max
-            'document' => 'nullable|file|max:10240|mimes:pdf,doc,docx,txt,xls,xlsx,ppt', // 10MB max
+            'photo' => 'nullable|image|max:1024', 
+            'document' => 'nullable|file|max:1024|mimes:pdf,doc,docx,txt,xls,xlsx,ppt', 
         ], [
             'message.required_without_all' => 'Either a message or a file is required',
         ]);

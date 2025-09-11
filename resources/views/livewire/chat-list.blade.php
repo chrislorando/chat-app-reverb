@@ -139,9 +139,9 @@
                                         : $row->latest_message->file_name ?? $row->email }} --}}
 
                                     @if ($content)
-                                        {{ \Illuminate\Support\Str::limit($content, 30) }}
+                                        {{ \Illuminate\Support\Str::limit($content, 25) }}
                                     @else
-                                        {{ $row->latest_message?->file_name ? \Illuminate\Support\Str::limit($row->latest_message?->file_name, 30) : $row->email }}
+                                        {{ $row->latest_message?->file_name ? \Illuminate\Support\Str::limit($row->latest_message?->file_name, 25) : $row->email }}
                                     @endif
 
                                 </p>

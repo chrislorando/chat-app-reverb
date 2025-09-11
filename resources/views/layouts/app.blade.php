@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     window.VAPID_PUBLIC_KEY = "{{ config('webpush.vapid.public_key') }}";
-    console.log('VAPID',window.VAPID_PUBLIC_KEY);
+    // console.log('VAPID',window.VAPID_PUBLIC_KEY);
 });
 
 document.addEventListener('livewire:navigated', () => {

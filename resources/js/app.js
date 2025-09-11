@@ -3,8 +3,8 @@ import "flowbite";
 // import { Drawer } from 'flowbite';
 
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-console.log('VAPID',window.VAPID_PUBLIC_KEY);
-console.log('CSRF',csrfToken);
+// console.log('VAPID',window.VAPID_PUBLIC_KEY);
+// console.log('CSRF',csrfToken);
 
 navigator.serviceWorker.register('/service-worker.js').then(registration => {
     Notification.requestPermission().then(async permission => {
