@@ -559,9 +559,7 @@ class ChatMessage extends Component
         ->where('receiver_id', $this->uid)
         ->orWhere('sender_id', $this->uid)
         ->where('receiver_id', auth()->id())
-        // ->take(5)
         ->orderBy('id','desc')
-        // ->latest()
         ->paginate($this->perPage);
 
         if($this->uid)

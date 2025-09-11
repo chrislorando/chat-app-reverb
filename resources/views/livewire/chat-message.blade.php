@@ -10,7 +10,7 @@ forwardMsgId: null
 
         <main class="md:ml-96 min-h-screen pt-12 bg-gray-900 pattern-grid">
 
-            <div class="grid grid-cols-1 sm:grid-cols-1 gap-4 mb-14 mt-4 p-5 pb-24">
+            <div class="grid grid-cols-1 sm:grid-cols-1 gap-4 mb-14 mt-2 p-5 pb-24">
                 <div id="old_last">&nbsp;</div>
 
                 @if($models->hasMorePages())
