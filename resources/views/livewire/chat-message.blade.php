@@ -676,15 +676,14 @@ forwardMsgId: null
                 </div>
 
                 {{-- <p>{{$message}}</p> --}}
-                <div 
-                    class="flex items-end gap-2" 
+                <div class="flex flex-col " 
                     {{-- x-show="$wire.isOpenWsDrawer" --}}
                 >
                     <textarea
                         x-show="$wire.isOpenWsDrawer"
                         wire:ignore
                         id="message-helper"
-                        class="flex-1 p-2.5 text-sm text-gray-500 border border-gray-300 rounded-xl bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
+                        class="p-2.5 text-sm text-gray-500 border border-gray-300 rounded-xl bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
                         style="height: 0; max-height: 120px;"
                         placeholder="Type a message"
                         autocomplete="off"
@@ -700,6 +699,8 @@ forwardMsgId: null
                             window.dispatchEvent(new CustomEvent('close-picker')); 
                         }"
                     ></textarea>
+                      <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">Write a sentence of at least 3 words.</p>
+
                 </div>
 
                 <hr class="h-px my-5 bg-gray-200 border-0 dark:bg-gray-700">
@@ -714,7 +715,7 @@ forwardMsgId: null
                 <ul wire:loading.remove wire:target="generateText, setWsCategory" class="my-4 space-y-3">
                     @foreach($generatedOptions as $option)
                         <li wire:key="option-{{$option}}">
-                            <button wire:loading.attr="disabled" type="button" data-drawer-hide="drawer-writing-helper" wire:click="selectOption('{{$option}}')" class="w-full flex items-center p-2 text-sm text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-700 dark:hover:bg-gray-500 dark:text-white">
+                            <button wire:loading.attr="disabled" type="button" data-drawer-hide="drawer-writing-helper" wire:click="selectOption('{{$option}}')" @click="document.body.classList.remove('overflow-hidden');" class="w-full flex items-center p-2 text-sm text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-700 dark:hover:bg-gray-500 dark:text-white">
                                 <span class="flex-1 text-left">
                                     {{$option}}
                                 </span>
