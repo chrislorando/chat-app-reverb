@@ -72,14 +72,14 @@ pipeline {
 
                         docker compose exec -T app php artisan webpush:vapid
                         
-                        docker compose exec -T app php artisan migrate --force
+                        docker compose exec -T app php artisan migrate --seed
                         
                         docker compose exec -T app php artisan optimize:clear
                         docker compose exec -T app php artisan optimize
 
                         docker compose exec -T app npm run build
 
-                        docker compose exec -T app php artisan reverb:start --debug &
+                        docker compose exec -T app php artisan reverb:start &
 
                     """
                 }
