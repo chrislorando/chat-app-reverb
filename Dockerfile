@@ -48,7 +48,7 @@ COPY . .
 RUN composer install --optimize-autoloader --no-interaction
 
 # Build frontend assets
-RUN npm run build
+# RUN npm run build
 
 RUN mkdir -p storage/framework/{cache,sessions,testing,views} \
     && mkdir -p database/ \
